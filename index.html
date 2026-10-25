@@ -1,0 +1,1287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Aveer’s Maths">
+<meta name="theme-color" content="#5B3FD1">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>Aveer’s Maths</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: a squared maths notebook — sticky header, then one view at a time (test list, test, marks, progress). */
+:root {
+  --paper: #F5F3FF;
+  --grid: rgba(91, 63, 209, .07);
+  --card: #FFFFFF;
+  --ink: #1F1846;
+  --muted: #5F5885;
+  --line: #DAD4F6;
+  --grape: #5B3FD1;
+  --grape-soft: #ECE7FF;
+  --on-grape: #FFFFFF;
+  --mint: #12976F;
+  --mint-soft: #DCF5EC;
+  --coral: #DC3F47;
+  --coral-soft: #FDE3E3;
+  --sun: #F5A700;
+  --sun-soft: #FFF1C9;
+  --shape: #CFE6FF;
+  --blk: #FFD58A;
+  --shadow: rgba(31, 24, 70, .10);
+  --scrim: rgba(20, 15, 50, .55);
+  --font-display: "Fredoka", "Trebuchet MS", "Arial Rounded MT Bold", sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14112E; --grid: rgba(190, 175, 255, .06); --card: #211C46; --ink: #F1EEFF; --muted: #ADA6D6; --line: #3A3370;
+    --grape: #9A88FF; --grape-soft: #2E2763; --on-grape: #120E2B; --mint: #3DD6A8; --mint-soft: #153D34;
+    --coral: #FF7D82; --coral-soft: #4A1E28; --sun: #FFC940; --sun-soft: #3D3215; --shape: #2A4A72; --blk: #8F6B22;
+    --shadow: rgba(0, 0, 0, .4); --scrim: rgba(0, 0, 0, .65);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14112E; --grid: rgba(190, 175, 255, .06); --card: #211C46; --ink: #F1EEFF; --muted: #ADA6D6; --line: #3A3370;
+  --grape: #9A88FF; --grape-soft: #2E2763; --on-grape: #120E2B; --mint: #3DD6A8; --mint-soft: #153D34;
+  --coral: #FF7D82; --coral-soft: #4A1E28; --sun: #FFC940; --sun-soft: #3D3215; --shape: #2A4A72; --blk: #8F6B22;
+  --shadow: rgba(0, 0, 0, .4); --scrim: rgba(0, 0, 0, .65);
+  color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; color: var(--ink); font-family: var(--font-body); font-size: 16px;
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+button { font: inherit; color: inherit; cursor: pointer; touch-action: manipulation; }
+button:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; margin: 0; text-wrap: balance; }
+.wrap { max-width: 960px; margin: 0 auto; padding-block: 0 40px; }
+
+/* Header */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding-block: 12px; background: var(--paper);
+}
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.brand-mark {
+  width: 44px; height: 44px; border-radius: 12px; background: var(--grape); color: var(--on-grape);
+  display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 22px; flex: 0 0 auto;
+  transform: rotate(-4deg);
+}
+.brand h1 { font-size: clamp(22px, 4vw, 28px); white-space: nowrap; }
+.nav { display: flex; gap: 6px; flex: 0 0 auto; }
+.nbtn {
+  height: 44px; padding: 0 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--card);
+  font-family: var(--font-display); font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 6px;
+}
+.nbtn[aria-current="true"] { background: var(--grape); color: var(--on-grape); border-color: var(--grape); }
+.nbtn .ic { font-size: 18px; }
+
+.card { background: var(--card); border: 2px solid var(--line); border-radius: 22px; box-shadow: 0 6px 18px var(--shadow); }
+
+/* Home */
+.hello { padding: 20px 22px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.hello h2 { font-size: clamp(26px, 5vw, 36px); }
+.hello p { margin: 6px 0 0; color: var(--muted); font-size: 17px; max-width: 46ch; }
+.big-btn {
+  min-height: 60px; padding: 0 26px; border-radius: 18px; border: 0; background: var(--grape); color: var(--on-grape);
+  font-family: var(--font-display); font-weight: 700; font-size: 21px; box-shadow: 0 5px 0 color-mix(in srgb, var(--grape) 60%, #000);
+  transition: transform .1s;
+}
+.big-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 color-mix(in srgb, var(--grape) 60%, #000); }
+.big-btn.alt { background: var(--card); color: var(--ink); border: 2px solid var(--line); box-shadow: 0 5px 0 var(--line); }
+
+.level { margin-bottom: 22px; }
+.level-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 0 4px 10px; }
+.level-head h3 { font-size: 22px; }
+.level-head span { color: var(--muted); font-size: 15px; }
+.tests { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tcard {
+  text-align: left; padding: 14px 16px; border-radius: 20px; border: 2px solid var(--line); background: var(--card);
+  display: flex; flex-direction: column; gap: 6px; min-height: 132px; box-shadow: 0 4px 12px var(--shadow);
+}
+.tcard .tn { display: flex; align-items: center; justify-content: space-between; }
+.tcard .tn b { font-family: var(--font-display); font-weight: 700; font-size: 24px; }
+.tcard .meta { color: var(--muted); font-size: 14px; }
+.tcard .best { font-family: var(--font-display); font-weight: 600; font-size: 18px; margin-top: auto; }
+.stars { color: var(--sun); letter-spacing: 2px; font-size: 18px; }
+.stars .off { color: var(--line); }
+.tcard.locked { opacity: .55; cursor: not-allowed; box-shadow: none; }
+.tcard.next { border-color: var(--grape); box-shadow: 0 0 0 3px var(--grape-soft), 0 4px 12px var(--shadow); }
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 800; }
+.pill.go { background: var(--grape); color: var(--on-grape); }
+.pill.ok { background: var(--mint-soft); color: var(--mint); }
+.pill.lock { background: var(--grape-soft); color: var(--muted); }
+
+/* Test */
+.tbar { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.tbar .ttl { font-family: var(--font-display); font-weight: 700; font-size: 18px; white-space: nowrap; }
+.prog { flex: 1; height: 14px; background: var(--grape-soft); border-radius: 999px; overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--grape); border-radius: 999px; transition: width .25s; }
+.timer { font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 800; white-space: nowrap; }
+.xbtn { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--line); background: var(--card); font-size: 18px; flex: 0 0 auto; }
+.qwrap { display: grid; gap: 14px; }
+@media (min-width: 820px) { .qwrap { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; } }
+.qcard { padding: 20px; min-width: 0; }
+.qhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: var(--grape-soft); color: var(--grape); font-weight: 800; font-size: 14px; }
+.qno { font-family: var(--font-display); color: var(--muted); font-weight: 600; }
+.speak { height: 40px; padding: 0 12px; border-radius: 12px; border: 2px solid var(--line); background: var(--card); font-weight: 800; font-size: 14px; }
+.qtext { font-family: var(--font-display); font-weight: 600; font-size: clamp(22px, 3.4vw, 28px); line-height: 1.3; }
+.qtext b { color: var(--grape); }
+.visual { margin-top: 16px; display: flex; justify-content: center; overflow-x: auto; }
+.visual svg { max-width: 100%; height: auto; }
+.slot { display: inline-block; min-width: 1.8em; padding: 0 .25em; border-bottom: 4px solid var(--grape); text-align: center; color: var(--grape); }
+.slot-box { display: inline-grid; place-items: center; width: 1.6em; height: 1.4em; border: 3px dashed var(--grape); border-radius: 10px; color: var(--grape); vertical-align: middle; }
+.colsum { margin: 10px auto 0; border-collapse: collapse; font-family: var(--font-display); font-weight: 600; font-size: clamp(34px, 6vw, 46px); font-variant-numeric: tabular-nums; }
+.colsum td { padding: 0 6px; text-align: right; letter-spacing: 4px; }
+.colsum td.op { color: var(--grape); letter-spacing: 0; }
+.colsum tr.res td { border-top: 4px solid var(--ink); }
+.colsum .slot { border: 0; min-width: 2em; }
+.seq { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.seq span { min-width: 64px; padding: 10px 12px; border-radius: 14px; background: var(--grape-soft); font-family: var(--font-display); font-weight: 700; font-size: 26px; text-align: center; font-variant-numeric: tabular-nums; }
+.seq span.q { background: var(--card); border: 3px dashed var(--grape); color: var(--grape); }
+.groups { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.grp { border: 3px solid var(--grape); border-radius: 50%; padding: 12px; min-width: 76px; min-height: 76px; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 2px; max-width: 120px; font-size: 22px; }
+.arr { display: grid; gap: 8px; justify-content: center; }
+.arr i { width: 22px; height: 22px; border-radius: 50%; background: var(--grape); display: block; }
+.items { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; font-size: 26px; max-width: 420px; }
+.money { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
+.coin { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 17px; color: #3B2A00; background: radial-gradient(circle at 35% 30%, #FFF0B8, #E7B735 60%, #B98A10); border: 3px solid #A67B0B; }
+.coin.c1, .coin.c2 { background: radial-gradient(circle at 35% 30%, #FFFFFF, #CFD5DD 60%, #9AA3AF); border-color: #8B94A1; color: #1F2733; width: 52px; height: 52px; }
+.coin.c10 { width: 64px; height: 64px; background: radial-gradient(circle at 35% 30%, #FFF6D8, #E9C55A 55%, #A9A9A9 56%, #C9CDD2); }
+.note { width: 112px; height: 58px; border-radius: 8px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #1F1846; border: 3px solid rgba(0,0,0,.25); position: relative; }
+.note::after { content: ""; position: absolute; inset: 6px; border: 2px dashed rgba(0,0,0,.18); border-radius: 4px; }
+.note.n10 { background: #E3B98F; } .note.n20 { background: #D9E58A; } .note.n50 { background: #9FD8E0; } .note.n100 { background: #C9B6E8; }
+.timeline { font-family: var(--font-display); font-size: 40px; font-weight: 700; color: var(--grape); }
+
+.acard { padding: 16px; min-width: 0; }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.opt {
+  min-height: 72px; border-radius: 18px; border: 3px solid var(--line); background: var(--card);
+  font-family: var(--font-display); font-weight: 600; font-size: 26px; padding: 8px; transition: transform .1s, background .15s;
+}
+.opt[aria-pressed="true"] { border-color: var(--grape); background: var(--grape-soft); color: var(--grape); transform: scale(1.03); }
+.opt.wide { font-size: 21px; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; vertical-align: middle; font-variant-numeric: tabular-nums; }
+.frac b { font-weight: 700; padding: 0 6px 3px; border-bottom: 3px solid currentColor; }
+.frac i { font-style: normal; font-weight: 700; padding-top: 3px; }
+.display {
+  height: 72px; border-radius: 18px; border: 3px solid var(--grape); background: var(--grape-soft);
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  font-family: var(--font-display); font-weight: 700; font-size: 40px; font-variant-numeric: tabular-nums; margin-bottom: 10px;
+}
+.display .ph { color: var(--muted); font-size: 20px; font-weight: 600; }
+.display .unit { font-size: 22px; color: var(--muted); }
+.pad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.key { height: 62px; border-radius: 16px; border: 2px solid var(--line); background: var(--card); font-family: var(--font-display); font-weight: 600; font-size: 28px; box-shadow: 0 3px 0 var(--line); }
+.key:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--line); }
+.key.fn { font-size: 18px; color: var(--muted); }
+.qnav { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
+.qnav .big-btn { flex: 1; }
+.qnav .back { flex: 0 0 auto; }
+
+/* Results */
+.res-hero { padding: 24px; display: grid; gap: 18px; text-align: center; justify-items: center; margin-bottom: 18px; }
+.marks { font-family: var(--font-display); font-weight: 700; font-size: clamp(64px, 14vw, 96px); line-height: 1; font-variant-numeric: tabular-nums; }
+.marks small { font-size: .45em; color: var(--muted); }
+.res-hero .stars { font-size: 40px; letter-spacing: 6px; }
+.res-msg { font-family: var(--font-display); font-weight: 700; font-size: 28px; }
+.res-facts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.res-facts span { padding: 6px 12px; border-radius: 999px; background: var(--grape-soft); font-weight: 800; font-size: 14px; }
+.res-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.notes { padding: 18px 20px; margin-bottom: 18px; }
+.notes h3, .section h3 { font-size: 21px; margin-bottom: 10px; }
+.notes ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 8px; }
+.notes li { display: flex; gap: 10px; align-items: flex-start; font-size: 16px; line-height: 1.45; }
+.notes li .dot { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 800; }
+.dot.up { background: var(--mint-soft); color: var(--mint); } .dot.down { background: var(--coral-soft); color: var(--coral); } .dot.flat { background: var(--grape-soft); color: var(--grape); }
+.section { padding: 18px 20px; margin-bottom: 18px; }
+.topics { display: grid; gap: 10px; }
+.trow { display: grid; grid-template-columns: minmax(0, 170px) minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.trow .nm { font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar { height: 14px; border-radius: 999px; background: var(--grape-soft); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 999px; }
+.topics.wide .trow { grid-template-columns: minmax(0, 170px) minmax(0, 1fr) 160px; }
+.trow .sc { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 14px; min-width: 96px; text-align: right; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 800; margin-left: 6px; }
+.tag.m { background: var(--mint-soft); color: var(--mint); } .tag.g { background: var(--sun-soft); color: color-mix(in srgb, var(--sun) 70%, var(--ink)); } .tag.n { background: var(--coral-soft); color: var(--coral); }
+.review { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.ritem { min-width: 0; }
+.ritem { border: 2px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+.ritem.wrong { border-color: color-mix(in srgb, var(--coral) 45%, var(--line)); background: color-mix(in srgb, var(--coral-soft) 50%, var(--card)); }
+.ritem summary { cursor: pointer; display: flex; gap: 10px; align-items: center; list-style: none; font-weight: 800; }
+.ritem summary::-webkit-details-marker { display: none; }
+.mark { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; }
+.mark.y { background: var(--mint); color: var(--card); } .mark.n { background: var(--coral); color: var(--card); }
+.ritem .rq { min-width: 0; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+.rbody { margin-top: 10px; display: grid; gap: 8px; }
+.rbody .qtext { font-size: 20px; }
+.rbody .visual { transform-origin: top center; }
+.ans-line { font-size: 16px; line-height: 1.5; }
+.ans-line b { font-family: var(--font-display); font-size: 19px; }
+.ans-line .gv { color: var(--coral); } .ans-line .cr { color: var(--mint); }
+.explain { background: var(--grape-soft); border-radius: 12px; padding: 10px 12px; font-size: 15.5px; line-height: 1.5; max-width: 70ch; }
+
+/* Progress */
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+.tile { padding: 14px 16px; }
+.tile .v { font-family: var(--font-display); font-weight: 700; font-size: 30px; font-variant-numeric: tabular-nums; }
+.tile .k { color: var(--muted); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .6px; }
+.chart-box { width: 100%; overflow: hidden; }
+.chart-box svg { display: block; width: 100%; }
+.chart-box text { fill: var(--muted); font-family: var(--font-body); font-weight: 700; font-size: 12px; }
+.hist { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+.hist th { text-align: left; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .6px; padding: 6px 8px; border-bottom: 2px solid var(--line); }
+.hist td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.hist details summary { cursor: pointer; color: var(--grape); font-weight: 800; }
+.hist ul { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
+.tblwrap { overflow-x: auto; }
+.empty { text-align: center; color: var(--muted); padding: 26px 10px; font-size: 17px; line-height: 1.5; }
+.empty b { display: block; font-family: var(--font-display); color: var(--ink); font-size: 22px; margin-bottom: 4px; }
+.parent { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.parent p { margin: 0; color: var(--muted); max-width: 56ch; line-height: 1.45; }
+.parent-text { display: grid; gap: 8px; justify-items: start; min-width: 0; }
+.save-status { display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 800; background: var(--grape-soft); color: var(--muted); }
+.parent-text .save-status { margin-top: 0; }
+.save-status.ok { background: var(--mint-soft); color: var(--mint); }
+.save-status.warn { background: var(--coral-soft); color: var(--coral); }
+.hello-actions { display: grid; gap: 8px; justify-items: center; }
+.backup { margin-top: 18px; padding-top: 16px; border-top: 2px dashed var(--line); display: grid; gap: 10px; }
+.backup p { margin: 0; color: var(--muted); max-width: 60ch; line-height: 1.45; }
+.backup-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.big-btn.small { min-height: 46px; font-size: 16px; padding: 0 16px; }
+.code-box { width: 100%; min-height: 84px; border-radius: 12px; border: 2px solid var(--line); background: var(--paper); color: var(--ink); font: 13px/1.4 ui-monospace, Menlo, monospace; padding: 10px; resize: vertical; }
+#restoreBox { display: grid; gap: 8px; justify-items: start; }
+.backup-msg { font-weight: 800; color: var(--mint) !important; min-height: 1em; }
+.link-btn { border: 0; background: none; color: var(--muted); font-weight: 800; text-decoration: underline; padding: 6px; }
+.switch { display: flex; align-items: center; gap: 10px; font-weight: 800; }
+.danger { background: var(--card); color: var(--coral); border: 2px solid var(--coral); height: 46px; border-radius: 14px; padding: 0 16px; font-weight: 800; }
+.danger[data-armed="true"] { background: var(--coral); color: var(--card); }
+
+/* Modal + toast */
+.modal { position: fixed; inset: 0; background: var(--scrim); display: grid; place-items: center; z-index: 20; padding: 16px; }
+.modal .card { max-width: 440px; width: 100%; padding: 22px; text-align: center; display: grid; gap: 14px; }
+.modal p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.45; }
+.modal .row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; width: 100%; height: 100%; }
+
+@media (max-width: 760px) {
+  .tests { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nbtn .lb { display: none; }
+  .nbtn { padding: 0 12px; }
+}
+@media (max-width: 480px) {
+  .tests { grid-template-columns: minmax(0, 1fr); }
+  .trow, .topics.wide .trow { grid-template-columns: minmax(0, 1fr) auto; }
+  .trow .bar { grid-column: 1 / -1; grid-row: 2; }
+  .brand h1 { font-size: 21px; }
+  .opt { font-size: 22px; min-height: 64px; }
+  .key { height: 56px; }
+  .tbar .ttl { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">+×</div>
+      <h1>Aveer’s Maths</h1>
+    </div>
+    <nav class="nav" id="nav">
+      <button class="nbtn" id="navHome" aria-current="true"><span class="ic" aria-hidden="true">📝</span><span class="lb">Tests</span></button>
+      <button class="nbtn" id="navProgress" aria-current="false"><span class="ic" aria-hidden="true">📈</span><span class="lb">Progress</span></button>
+      <button class="nbtn" id="navSound" aria-label="Sound on"><span class="ic" aria-hidden="true">🔊</span></button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="viewHome"></section>
+    <section id="viewTest" hidden></section>
+    <section id="viewResult" hidden></section>
+    <section id="viewProgress" hidden></section>
+  </main>
+</div>
+
+<div class="modal" id="modal" hidden><div class="card" role="dialog" aria-modal="true" id="modalCard"></div></div>
+<canvas id="confetti" hidden></canvas>
+
+<script>
+(() => {
+  'use strict';
+  // ================= Basics =================
+  const $ = id => document.getElementById(id);
+  const TOTAL = 15, PASS = 9;
+  const TOPICS = {
+    place:   { name: 'Place value', icon: '🔢' },
+    compare: { name: 'Compare numbers', icon: '⚖️' },
+    add:     { name: 'Addition', icon: '➕' },
+    sub:     { name: 'Subtraction', icon: '➖' },
+    mul:     { name: 'Multiplication', icon: '✖️' },
+    div:     { name: 'Sharing (division)', icon: '➗' },
+    pattern: { name: 'Number patterns', icon: '🔁' },
+    time:    { name: 'Time', icon: '🕒' },
+    money:   { name: 'Money', icon: '💰' },
+    shapes:  { name: 'Shapes', icon: '🔷' },
+    fraction:{ name: 'Fractions', icon: '🍕' },
+    word:    { name: 'Word problems', icon: '📖' }
+  };
+  const LEVELS = [
+    { name: 'Level 1 · Starter', blurb: 'Numbers to 100, adding without carrying, tables of 2, 5 and 10, o’clock' },
+    { name: 'Level 2 · Explorer', blurb: 'Carrying and borrowing, numbers to 500, tables 2 to 5, half past' },
+    { name: 'Level 3 · Adventurer', blurb: 'Numbers to 999, sharing equally, quarter past and quarter to' },
+    { name: 'Level 4 · Champion', blurb: '3-digit sums, all tables to 10, giving change, 3D shapes' }
+  ];
+  const PLAN = [
+    ['place','place','compare','add','add','sub','sub','mul','pattern','pattern','time','money','shapes','fraction','word'],
+    ['place','compare','add','add','sub','sub','mul','mul','pattern','time','money','shapes','fraction','word','word'],
+    ['place','compare','add','add','sub','sub','mul','mul','div','pattern','time','money','shapes','fraction','word'],
+    ['place','add','add','sub','sub','mul','mul','div','pattern','time','money','shapes','fraction','word','word']
+  ];
+  const lv = t => Math.ceil(t / 3);
+
+  let R = Math.random;
+  const seedRng = s => { let a = s >>> 0; R = () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+  const ri = (a, b) => a + Math.floor(R() * (b - a + 1));
+  const pick = arr => arr[Math.floor(R() * arr.length)];
+  const shuffle = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const uniq = arr => [...new Set(arr)];
+
+  // ================= Question helpers =================
+  const NAMES = ['Simran', 'Kabir', 'Meher', 'Arjun', 'Noor', 'Jasleen', 'Rohan', 'Ishaan'];
+  const ITEMS = [['mangoes', '🥭'], ['marbles', '🔵'], ['stickers', '⭐'], ['kites', '🪁'], ['pencils', '✏️'], ['laddoos', '🟠'], ['balloons', '🎈'], ['toy cars', '🚗'], ['apples', '🍎']];
+  const hero = () => R() < 0.45 ? 'Aveer' : pick(NAMES);
+  const other = h => pick(NAMES.filter(n => n !== h));
+
+  function numQ(topic, html, say, answer, explain, extra = {}) {
+    return Object.assign({ topic, html, say, kind: 'num', answer: String(answer), explain, prefix: '', suffix: '', visual: '' }, extra);
+  }
+  function mcQ(topic, html, say, options, answer, explain, extra = {}) {
+    const opts = options.map(o => typeof o === 'object' ? o : { html: String(o), text: String(o), value: String(o) });
+    return Object.assign({ topic, html, say, kind: 'mc', options: opts, answer: String(answer), explain, visual: '' }, extra);
+  }
+  function numOptions(correct, pool) {
+    const c = Number(correct);
+    let d = uniq(pool.filter(x => x !== c && x >= 0));
+    d = shuffle(d).slice(0, 3);
+    let k = 1;
+    while (d.length < 3) { const v = c + k * (k % 2 ? 1 : -1) * 2; if (v >= 0 && v !== c && !d.includes(v)) d.push(v); k++; }
+    return shuffle([c, ...d]);
+  }
+  const fracHTML = (k, n) => `<span class="frac"><b>${k}</b><i>${n}</i></span>`;
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+
+  function colSum(a, b, op) {
+    return `<table class="colsum" aria-hidden="true"><tr><td></td><td>${a}</td></tr><tr><td class="op">${op}</td><td>${b}</td></tr><tr class="res"><td></td><td><span class="slot">?</span></td></tr></table>`;
+  }
+  const PLACE = ['ones', 'tens', 'hundreds'];
+  function explainAdd(a, b) {
+    const da = String(a).split('').reverse().map(Number), db = String(b).split('').reverse().map(Number);
+    const n = Math.max(da.length, db.length); let carry = 0; const parts = [];
+    for (let i = 0; i < n; i++) {
+      const x = da[i] || 0, y = db[i] || 0, s = x + y + carry;
+      let t = `${PLACE[i][0].toUpperCase() + PLACE[i].slice(1)}: ${x} + ${y}${carry ? ' + 1 carried' : ''} = ${s}`;
+      if (s >= 10 && i < n - 1) t += `, write ${s % 10} and carry 1`;
+      parts.push(t); carry = s >= 10 ? 1 : 0;
+    }
+    return parts.join('. ') + `. So ${a} + ${b} = ${a + b}.`;
+  }
+  function explainSub(a, b) {
+    const da = String(a).split('').reverse().map(Number), db = String(b).split('').reverse().map(Number);
+    const parts = []; let borrow = 0;
+    for (let i = 0; i < da.length; i++) {
+      let x = da[i] - borrow; const y = db[i] || 0; borrow = 0;
+      if (i >= db.length && x === 0 && i === da.length - 1) break;
+      let t = PLACE[i][0].toUpperCase() + PLACE[i].slice(1) + ': ';
+      if (x < y) { t += `${x} is smaller than ${y}, so borrow 1 ${PLACE[i + 1].slice(0, -1)}. ${x + 10} − ${y} = ${x + 10 - y}`; borrow = 1; }
+      else t += `${x} − ${y} = ${x - y}`;
+      parts.push(t);
+    }
+    return parts.join('. ') + `. So ${a} − ${b} = ${a - b}.`;
+  }
+
+  // ---------- Visuals ----------
+  function blocksSVG(h, t, o) {
+    const u = 9, H = u * 10; let x = 4, out = '';
+    const grid = (x0, w, hgt) => { let p = ''; for (let i = 1; i < w / u; i++) p += `M${x0 + i * u} 4V${4 + hgt}`; for (let j = 1; j < hgt / u; j++) p += `M${x0} ${4 + j * u}H${x0 + w}`; return p; };
+    for (let i = 0; i < h; i++) { out += `<rect x="${x}" y="4" width="${H}" height="${H}" rx="2" fill="var(--blk)" stroke="var(--ink)" stroke-width="2"/><path d="${grid(x, H, H)}" stroke="var(--ink)" stroke-opacity=".35" stroke-width="1"/>`; x += H + 10; }
+    if (h) x += 6;
+    for (let i = 0; i < t; i++) { out += `<rect x="${x}" y="4" width="${u}" height="${H}" rx="1.5" fill="var(--shape)" stroke="var(--ink)" stroke-width="2"/><path d="${grid(x, u, H)}" stroke="var(--ink)" stroke-opacity=".35" stroke-width="1"/>`; x += u + 7; }
+    if (t) x += 8;
+    for (let i = 0; i < o; i++) { const col = Math.floor(i / 5), row = i % 5; out += `<rect x="${x + col * (u + 5)}" y="${4 + H - (row + 1) * (u + 4) + 4}" width="${u}" height="${u}" rx="1.5" fill="var(--mint-soft)" stroke="var(--ink)" stroke-width="2"/>`; }
+    if (o) x += Math.ceil(o / 5) * (u + 5);
+    const w = Math.max(x + 4, 60);
+    return `<svg viewBox="0 0 ${w} ${H + 8}" width="${Math.min(w * 1.6, 560)}" role="img" aria-label="base ten blocks">${out}</svg>`;
+  }
+  function clockSVG(h, m) {
+    let s = `<svg viewBox="0 0 220 220" width="220" role="img" aria-label="clock"><circle cx="110" cy="110" r="102" fill="var(--card)" stroke="var(--ink)" stroke-width="6"/>`;
+    for (let i = 0; i < 60; i++) {
+      const a = i * 6 * Math.PI / 180, big = i % 5 === 0, r1 = big ? 88 : 93;
+      s += `<line x1="${110 + Math.sin(a) * r1}" y1="${110 - Math.cos(a) * r1}" x2="${110 + Math.sin(a) * 98}" y2="${110 - Math.cos(a) * 98}" stroke="var(--ink)" stroke-width="${big ? 3 : 1.4}" stroke-opacity="${big ? 1 : .5}"/>`;
+    }
+    for (let n = 1; n <= 12; n++) { const a = n * 30 * Math.PI / 180; s += `<text x="${110 + Math.sin(a) * 72}" y="${110 - Math.cos(a) * 72 + 8}" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="22" fill="var(--ink)">${n}</text>`; }
+    const ha = ((h % 12) + m / 60) * 30 * Math.PI / 180, ma = m * 6 * Math.PI / 180;
+    s += `<line x1="110" y1="110" x2="${110 + Math.sin(ha) * 48}" y2="${110 - Math.cos(ha) * 48}" stroke="var(--coral)" stroke-width="9" stroke-linecap="round"/>`;
+    s += `<line x1="110" y1="110" x2="${110 + Math.sin(ma) * 80}" y2="${110 - Math.cos(ma) * 80}" stroke="var(--grape)" stroke-width="5" stroke-linecap="round"/>`;
+    return s + `<circle cx="110" cy="110" r="7" fill="var(--ink)"/></svg>`;
+  }
+  const SHAPE_SIDES = { triangle: 3, square: 4, rectangle: 4, pentagon: 5, hexagon: 6 };
+  function shapeSVG(name) {
+    const st = 'fill="var(--shape)" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"';
+    const reg = (n, r = 66) => { const p = []; for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + i * 2 * Math.PI / n; p.push((100 + Math.cos(a) * r).toFixed(1) + ',' + (84 + Math.sin(a) * r).toFixed(1)); } return `<polygon points="${p.join(' ')}" ${st}/>`; };
+    const dash = 'fill="none" stroke="var(--ink)" stroke-width="3" stroke-dasharray="7 6" stroke-opacity=".6"';
+    const body = {
+      circle: `<circle cx="100" cy="82" r="64" ${st}/>`,
+      oval: `<ellipse cx="100" cy="82" rx="86" ry="52" ${st}/>`,
+      triangle: `<polygon points="100,18 176,142 24,142" ${st}/>`,
+      square: `<rect x="40" y="22" width="120" height="120" rx="3" ${st}/>`,
+      rectangle: `<rect x="14" y="40" width="172" height="86" rx="3" ${st}/>`,
+      pentagon: reg(5), hexagon: reg(6),
+      cube: `<polygon points="45,62 75,32 160,32 130,62" ${st}/><polygon points="130,62 160,32 160,117 130,147" ${st}/><rect x="45" y="62" width="85" height="85" ${st}/>`,
+      cuboid: `<polygon points="20,70 50,42 186,42 156,70" ${st}/><polygon points="156,70 186,42 186,102 156,130" ${st}/><rect x="20" y="70" width="136" height="60" ${st}/>`,
+      cylinder: `<path d="M40,38 L40,124 A60,17 0 0 0 160,124 L160,38" ${st}/><ellipse cx="100" cy="38" rx="60" ry="17" ${st}/><path d="M40,124 A60,17 0 0 1 160,124" ${dash}/>`,
+      cone: `<path d="M40,128 L100,16 L160,128 A60,17 0 0 1 40,128 Z" ${st}/><path d="M40,128 A60,17 0 0 1 160,128" ${dash}/>`,
+      sphere: `<circle cx="100" cy="82" r="64" ${st}/><path d="M36,82 A64,18 0 0 0 164,82" fill="none" stroke="var(--ink)" stroke-width="3"/><path d="M36,82 A64,18 0 0 1 164,82" ${dash}/>`
+    }[name];
+    return `<svg viewBox="0 0 200 164" width="230" role="img" aria-label="a shape">${body}</svg>`;
+  }
+  function fracSVG(n, k, kind) {
+    const on = 'var(--grape)', off = 'var(--card)', st = 'stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"';
+    const shaded = new Set(shuffle([...Array(n).keys()]).slice(0, k));
+    let s = '';
+    if (kind === 'pie') {
+      for (let i = 0; i < n; i++) {
+        const a0 = -Math.PI / 2 + i * 2 * Math.PI / n, a1 = a0 + 2 * Math.PI / n;
+        s += `<path d="M90,90 L${(90 + 72 * Math.cos(a0)).toFixed(2)},${(90 + 72 * Math.sin(a0)).toFixed(2)} A72,72 0 0 1 ${(90 + 72 * Math.cos(a1)).toFixed(2)},${(90 + 72 * Math.sin(a1)).toFixed(2)} Z" fill="${shaded.has(i) ? on : off}" ${st}/>`;
+      }
+      return `<svg viewBox="0 0 180 180" width="200" role="img" aria-label="circle cut into equal parts">${s}</svg>`;
+    }
+    if (kind === 'grid') {
+      for (let i = 0; i < 4; i++) s += `<rect x="${10 + (i % 2) * 70}" y="${10 + Math.floor(i / 2) * 70}" width="70" height="70" fill="${shaded.has(i) ? on : off}" ${st}/>`;
+      return `<svg viewBox="0 0 160 160" width="180" role="img" aria-label="square cut into equal parts">${s}</svg>`;
+    }
+    const w = 240 / n;
+    for (let i = 0; i < n; i++) s += `<rect x="${10 + i * w}" y="10" width="${w}" height="80" fill="${shaded.has(i) ? on : off}" ${st}/>`;
+    return `<svg viewBox="0 0 260 100" width="270" role="img" aria-label="bar cut into equal parts">${s}</svg>`;
+  }
+  const moneyHTML = list => `<div class="money">${list.map(([kind, v]) => kind === 'c' ? `<span class="coin c${v}">₹${v}</span>` : `<span class="note n${v}">₹${v}</span>`).join('')}</div>`;
+  const seqHTML = (arr, gap) => `<div class="seq">${arr.map((v, i) => i === gap ? '<span class="q slot">?</span>' : `<span>${v}</span>`).join('')}</div>`;
+
+  // ================= Generators =================
+  const G = {};
+  G.place = t => {
+    const L = lv(t);
+    const v = pick(L === 1 ? ['blocks', 'tens', 'build'] : L === 2 ? ['blocks', 'digit', 'build3'] : ['expanded', 'digit', 'tensplace', 'blocks']);
+    if (v === 'blocks') {
+      const h = L === 1 ? 0 : ri(1, L === 2 ? 4 : 6), tn = ri(L === 1 ? 2 : 0, 9), o = ri(0, 9), n = h * 100 + tn * 10 + o;
+      return numQ('place', 'What number do the blocks show?', 'What number do the blocks show?', n,
+        `${h ? `${plural(h, 'hundred')} (big squares), ` : ''}${tn} tens (long sticks) and ${o} ones (small cubes) make ${n}.`, { visual: blocksSVG(h, tn, o) });
+    }
+    if (v === 'tens') {
+      const n = ri(11, 99);
+      return numQ('place', `How many <b>tens</b> are in <b>${n}</b>?`, `How many tens are in ${n}?`, Math.floor(n / 10), `${n} is ${Math.floor(n / 10)} tens and ${n % 10} ones.`);
+    }
+    if (v === 'build') {
+      const tn = ri(1, 9), o = ri(0, 9);
+      return numQ('place', `What number has <b>${tn} ${tn === 1 ? 'ten' : 'tens'}</b> and <b>${o} ${o === 1 ? 'one' : 'ones'}</b>?`, `What number has ${tn} ${tn === 1 ? 'ten' : 'tens'} and ${o} ${o === 1 ? 'one' : 'ones'}?`, tn * 10 + o, `${tn} tens is ${tn * 10}. ${tn * 10} + ${o} = ${tn * 10 + o}.`);
+    }
+    if (v === 'build3') {
+      const h = ri(1, 4), tn = ri(0, 9), o = ri(0, 9), n = h * 100 + tn * 10 + o;
+      return numQ('place', `What number has <b>${h} hundreds</b>, <b>${tn} tens</b> and <b>${o} ones</b>?`, `What number has ${h} hundreds, ${tn} tens and ${o} ones?`, n, `${h * 100} + ${tn * 10} + ${o} = ${n}.`);
+    }
+    if (v === 'digit') {
+      let n, ds;
+      do { n = ri(102, L === 2 ? 500 : 999); ds = String(n).split(''); } while (uniq(ds).length < 3 || ds.includes('0'));
+      const pos = ri(0, 2), d = Number(ds[2 - pos]), val = d * [1, 10, 100][pos];
+      return mcQ('place', `What is the value of the digit <b>${d}</b> in <b>${n}</b>?`, `What is the value of the digit ${d} in ${n}?`,
+        shuffle([d, d * 10, d * 100, d * 1000]), val, `In ${n}, the ${d} is in the ${PLACE[pos]} place, so its value is ${val}.`);
+    }
+    if (v === 'expanded') {
+      const h = ri(1, 9), tn = ri(0, 9), o = ri(1, 9), n = h * 100 + tn * 10 + o;
+      const terms = [h * 100, tn * 10, o].filter(x => x);
+      return numQ('place', `What is <b>${terms.join(' + ')}</b>?`, `What is ${terms.join(' plus ')}?`, n, `${h} hundreds, ${tn} tens and ${o} ones make ${n}.`);
+    }
+    // tensplace
+    const d = ri(1, 9);
+    const mk = (hu, te, on) => hu * 100 + te * 10 + on;
+    const others = () => { let x; do { x = ri(1, 9); } while (x === d); return x; };
+    const right = mk(others(), d, others());
+    const opts = shuffle([right, mk(d, others(), others()), mk(others(), others(), d), mk(others(), others(), others())]);
+    return mcQ('place', `Which number has <b>${d}</b> in the <b>tens</b> place?`, `Which number has ${d} in the tens place?`, opts, right,
+      `The tens place is the middle digit. In ${right}, the middle digit is ${d}.`);
+  };
+
+  G.compare = t => {
+    const L = lv(t);
+    const v = pick(L === 1 ? ['sign', 'sign', 'evenodd'] : ['sign', 'evenodd', 'greatest', 'smallest']);
+    if (v === 'evenodd') {
+      const n = ri(10, L === 1 ? 60 : 300), even = n % 2 === 0;
+      return mcQ('compare', `Is <b>${n}</b> even or odd?`, `Is ${n} even or odd?`, ['Even', 'Odd'], even ? 'Even' : 'Odd',
+        `${n} ends in ${n % 10}. Numbers ending in 0, 2, 4, 6 or 8 are even. The others are odd. So ${n} is ${even ? 'even' : 'odd'}.`);
+    }
+    if (v === 'sign') {
+      const max = [99, 500, 999, 999][L - 1], min = L === 1 ? 10 : 100;
+      const a = ri(min, max); let b = R() < 0.12 ? a : ri(min, max);
+      if (L > 1 && b !== a && R() < 0.5) b = Math.floor(a / 10) * 10 + ri(0, 9);
+      const sign = a > b ? '>' : a < b ? '<' : '=';
+      return mcQ('compare', `Which sign goes in the box?<div class="visual" style="font-size:44px;gap:14px;align-items:center">${a} <span class="slot-box">?</span> ${b}</div>`,
+        `Which sign goes in the box between ${a} and ${b}?`, ['>', '<', '='].map(s => ({ html: s, text: s, value: s })), sign,
+        a === b ? `Both numbers are the same, so we use =.` : `${a} is ${a > b ? 'more' : 'less'} than ${b}, so we use ${sign}. The open mouth always faces the bigger number.`);
+    }
+    const max = L === 2 ? 500 : 999, base = ri(1, Math.floor(max / 100) - 1) * 100;
+    const nums = uniq(Array.from({ length: 8 }, () => base + ri(0, 99) + (R() < 0.3 ? 100 : 0))).slice(0, 4);
+    while (nums.length < 4) nums.push(base + ri(0, 199));
+    const four = uniq(nums).slice(0, 4);
+    const ans = v === 'greatest' ? Math.max(...four) : Math.min(...four);
+    return mcQ('compare', `Which number is the <b>${v}</b>?`, `Which number is the ${v}?`, shuffle(four), ans,
+      `Compare the hundreds first, then the tens, then the ones. ${ans} is the ${v}.`);
+  };
+
+  G.add = t => {
+    const L = lv(t); let a, b;
+    if (L === 1) { const a1 = ri(1, 7), b1 = ri(1, 8 - a1), a0 = ri(0, 8), b0 = ri(0, 9 - a0); a = a1 * 10 + a0; b = b1 * 10 + b0; if (t === 1 && R() < 0.5) b = b0 || 1; }
+    else if (L === 2) { const a0 = ri(2, 9), b0 = R() < 0.7 ? ri(10 - a0, 9) : ri(0, 9 - a0), a1 = ri(1, 6), b1 = ri(1, 8 - a1); a = a1 * 10 + a0; b = b1 * 10 + b0; }
+    else if (L === 3) { if (R() < 0.5) { a = ri(45, 95); b = ri(30, 95); } else { a = ri(100, 850); b = ri(11, 99); } }
+    else { a = ri(120, 600); b = ri(100, 980 - a); }
+    if (L >= 2 && R() < 0.3) {
+      return numQ('add', `Find the missing number.<div class="visual" style="font-size:40px">${a} + <span class="slot">?</span> = ${a + b}</div>`,
+        `${a} plus what number makes ${a + b}?`, b, `${a + b} − ${a} = ${b}. Check: ${a} + ${b} = ${a + b}.`);
+    }
+    return numQ('add', `Add.${colSum(a, b, '+')}`, `What is ${a} plus ${b}?`, a + b, explainAdd(a, b));
+  };
+
+  G.sub = t => {
+    const L = lv(t); let a, b;
+    if (L === 1) { const a1 = ri(2, 9), a0 = ri(1, 9), b1 = ri(0, a1 - 1), b0 = ri(0, a0); a = a1 * 10 + a0; b = b1 * 10 + b0 || 1; if (b >= a) b = a - 1; }
+    else if (L === 2) { const a0 = ri(0, 8), b0 = R() < 0.7 ? ri(a0 + 1, 9) : ri(0, a0), a1 = ri(3, 9), b1 = ri(1, a1 - 1); a = a1 * 10 + a0; b = b1 * 10 + b0; }
+    else if (L === 3) { a = ri(120, 999); b = ri(11, 99); }
+    else { a = ri(300, 999); b = ri(100, a - 40); }
+    if (L >= 2 && R() < 0.3) {
+      return numQ('sub', `Find the missing number.<div class="visual" style="font-size:40px">${a} − <span class="slot">?</span> = ${a - b}</div>`,
+        `${a} minus what number leaves ${a - b}?`, b, `${a} − ${a - b} = ${b}. Check: ${a} − ${b} = ${a - b}.`);
+    }
+    return numQ('sub', `Subtract.${colSum(a, b, '−')}`, `What is ${a} minus ${b}?`, a - b, explainSub(a, b));
+  };
+
+  G.mul = t => {
+    const L = lv(t);
+    const tables = [[2, 5, 10], [2, 3, 4, 5, 10], [2, 3, 4, 5, 6, 10], [2, 3, 4, 5, 6, 7, 8, 9, 10]][L - 1];
+    const v = pick(L === 1 ? ['groups', 'repeat', 'fact'] : L === 2 ? ['groups', 'array', 'fact'] : L === 3 ? ['array', 'fact', 'missing'] : ['fact', 'missing', 'repeat']);
+    if (v === 'groups') {
+      const g = ri(2, 5), m = pick(L === 1 ? [2, 3, 5] : [2, 3, 4, 5]), [, e] = pick(ITEMS);
+      const vis = `<div class="groups">${Array.from({ length: g }, () => `<div class="grp">${e.repeat(m)}</div>`).join('')}</div>`;
+      return numQ('mul', `How many ${e} are there in all?`, `There are ${g} groups with ${m} in each group. How many in all?`, g * m,
+        `There are ${g} groups of ${m}. ${Array(g).fill(m).join(' + ')} = ${g * m}, so ${g} × ${m} = ${g * m}.`, { visual: vis });
+    }
+    if (v === 'array') {
+      const r = ri(2, 5), c = ri(2, 6);
+      const vis = `<div class="arr" style="grid-template-columns:repeat(${c}, 22px)">${'<i></i>'.repeat(r * c)}</div>`;
+      return numQ('mul', `There are <b>${r} rows</b> with <b>${c} dots</b> in each row. How many dots in all?`, `There are ${r} rows with ${c} dots in each row. How many dots in all?`, r * c,
+        `${r} rows of ${c} is ${r} × ${c} = ${r * c}.`, { visual: vis });
+    }
+    if (v === 'repeat') {
+      const m = pick(tables), g = ri(3, 5);
+      const opts = uniq([`${g} × ${m}`, `${g} + ${m}`, `${g + 1} × ${m}`, `${m} × ${m}`, `${g} × ${m + 1}`]).slice(0, 4);
+      return mcQ('mul', `<b>${Array(g).fill(m).join(' + ')}</b> is the same as …`, `${Array(g).fill(m).join(' plus ')} is the same as what?`,
+        shuffle(opts).map(o => ({ html: o, text: o, value: o, wide: true })), `${g} × ${m}`, `${m} is added ${g} times, so it is ${g} × ${m} = ${g * m}.`);
+    }
+    const m = pick(tables), k = ri(L === 1 ? 1 : 2, L === 1 ? 5 : 10);
+    if (v === 'missing') {
+      return numQ('mul', `Find the missing number.<div class="visual" style="font-size:40px"><span class="slot">?</span> × ${m} = ${k * m}</div>`,
+        `What number times ${m} makes ${k * m}?`, k, `Count in ${m}s: ${Array.from({ length: k }, (_, i) => (i + 1) * m).join(', ')}. That is ${k} jumps, so ${k} × ${m} = ${k * m}.`);
+    }
+    return numQ('mul', `Multiply.<div class="visual" style="font-size:44px">${m} × ${k} = <span class="slot">?</span></div>`, `What is ${m} times ${k}?`, m * k,
+      `Count in ${m}s ${k} times: ${Array.from({ length: k }, (_, i) => (i + 1) * m).join(', ')}. So ${m} × ${k} = ${m * k}.`);
+  };
+
+  G.div = t => {
+    const L = lv(t), d = pick(L === 3 ? [2, 3, 4, 5] : [2, 3, 4, 5, 6, 8, 10]), q = ri(2, L === 3 ? 5 : 8), total = d * q;
+    if (L === 4 && R() < 0.5) {
+      return numQ('div', `Divide.<div class="visual" style="font-size:44px">${total} ÷ ${d} = <span class="slot">?</span></div>`, `What is ${total} divided by ${d}?`, q,
+        `${d} × ${q} = ${total}, so ${total} ÷ ${d} = ${q}.`);
+    }
+    const [item, e] = pick(ITEMS);
+    return numQ('div', `<b>${total}</b> ${item} are shared equally among <b>${d}</b> friends. How many does each friend get?`,
+      `${total} ${item} are shared equally among ${d} friends. How many does each friend get?`, q,
+      `Share them out one by one into ${d} groups. Each group gets ${q}, because ${d} × ${q} = ${total}. So ${total} ÷ ${d} = ${q}.`,
+      { visual: total <= 30 ? `<div class="items">${e.repeat(total)}</div>` : '' });
+  };
+
+  G.pattern = t => {
+    const L = lv(t); let step, start, back = false;
+    if (L === 1) { step = pick([2, 5, 10]); start = step * ri(1, 6); }
+    else if (L === 2) { step = pick([3, 4, 5, 10, 2]); back = R() < 0.35; start = back ? ri(50, 100) : ri(1, 30); }
+    else if (L === 3) { step = pick([25, 50, 100, 10, 5]); back = R() < 0.35; start = step >= 25 ? step * ri(back ? 6 : 1, back ? 12 : 6) : ri(back ? 150 : 100, back ? 300 : 200); }
+    else { step = pick([6, 7, 8, 9, 11, 25, 50, 100]); back = R() < 0.4; start = back ? ri(200, 600) : ri(10, 300); }
+    if (back && start - 4 * step < 0) start = 4 * step + ri(0, 60);
+    const s = back ? -step : step;
+    const seq = Array.from({ length: 5 }, (_, i) => start + i * s);
+    const gap = L === 1 ? 4 : (R() < 0.6 ? 4 : ri(1, 3));
+    const ans = seq[gap];
+    const shown = seq.map((v, i) => i === gap ? '?' : v).join(', ');
+    return numQ('pattern', 'Which number is missing?', `What number is missing? ${shown}`, ans,
+      `The numbers go ${back ? 'down' : 'up'} by ${step} each time. ${gap > 0 ? `${seq[gap - 1]} ${back ? '−' : '+'} ${step} = ${ans}.` : `${seq[1]} ${back ? '+' : '−'} ${step} = ${ans}.`}`,
+      { visual: seqHTML(seq, gap) });
+  };
+
+  const fmtT = (h, m) => `${h}:${String(m).padStart(2, '0')}`;
+  const timeWords = (h, m) => m === 0 ? `${h} o’clock` : m === 15 ? `quarter past ${h}` : m === 30 ? `half past ${h}` : m === 45 ? `quarter to ${h % 12 + 1}` : `${m} minutes past ${h}`;
+  G.time = t => {
+    const L = lv(t), h = ri(1, 12), m = L === 1 ? 0 : L === 2 ? pick([0, 30, 30]) : L === 3 ? pick([15, 30, 45, 0]) : 5 * ri(1, 11);
+    if (L === 4 && R() < 0.3) {
+      const add = pick([1, 2]), h2 = (h + add - 1) % 12 + 1;
+      const opts = uniq([fmtT(h2, m), fmtT(h, (m + 30) % 60), fmtT((h + add) % 12 + 1, m), fmtT(h2, (m + 15) % 60)]).slice(0, 4);
+      while (opts.length < 4) opts.push(fmtT((h + opts.length) % 12 + 1, m));
+      return mcQ('time', `It is <b>${fmtT(h, m)}</b> now. What time will it be <b>${plural(add, 'hour')}</b> later?`, `It is ${fmtT(h, m)} now. What time will it be ${plural(add, 'hour')} later?`,
+        shuffle(opts), fmtT(h2, m), `Move the hour on by ${add}: ${h} → ${h2}. The minutes stay the same, so it will be ${fmtT(h2, m)}.`);
+    }
+    const right = fmtT(h, m);
+    const swapH = m === 0 ? 12 : m / 5, swapM = (h % 12) * 5;
+    const pool = [fmtT(swapH, swapM), fmtT(h % 12 + 1, m), fmtT((h + 10) % 12 + 1, m), fmtT(h, (m + 30) % 60), fmtT(h, (m + 15) % 60)];
+    const opts = shuffle(uniq(pool.filter(x => x !== right))).slice(0, 3);
+    const ex = m === 0
+      ? `The long minute hand points to 12 and the short hour hand points to ${h}. So it is ${h} o’clock (${right}).`
+      : `The long minute hand points to ${m / 5}, which means ${m} minutes. The short hour hand has gone past ${h}. So it is ${right} (${timeWords(h, m)}).`;
+    return mcQ('time', 'What time does the clock show?', 'What time does the clock show?', shuffle([right, ...opts]), right, ex, { visual: clockSVG(h, m) });
+  };
+
+  G.money = t => {
+    const L = lv(t), H = hero();
+    if (L === 4 && R() < 0.6) {
+      const price = ri(11, 89), pay = price < 50 && R() < 0.5 ? 50 : 100, [item] = pick([['toy car'], ['notebook'], ['ice cream'], ['kite'], ['box of crayons']]);
+      return numQ('money', `${H} buys a ${item} for <b>₹${price}</b> and pays with a <b>₹${pay}</b> note. How much change does ${H} get?`,
+        `${H} buys a ${item} for ${price} rupees and pays with a ${pay} rupee note. How much change?`, pay - price,
+        `Change = money given − price. ₹${pay} − ₹${price} = ₹${pay - price}.`, { prefix: '₹', visual: moneyHTML([['n', pay]]) });
+    }
+    if (L === 3 && R() < 0.35) {
+      const a = ri(5, 45), b = ri(5, 45), [x, y] = shuffle(['pencil', 'eraser', 'sharpener', 'ruler', 'notebook']).slice(0, 2);
+      return numQ('money', `A ${x} costs <b>₹${a}</b> and a ${y} costs <b>₹${b}</b>. How much do they cost together?`,
+        `A ${x} costs ${a} rupees and a ${y} costs ${b} rupees. How much together?`, a + b, `₹${a} + ₹${b} = ₹${a + b}.`, { prefix: '₹' });
+    }
+    let list;
+    if (L === 1) list = Array.from({ length: ri(2, 5) }, () => ['c', pick([1, 2, 5, 5, 2])]);
+    else if (L === 2) list = [...Array.from({ length: ri(1, 2) }, () => ['n', pick([10, 20])]), ...Array.from({ length: ri(1, 3) }, () => ['c', pick([1, 2, 5, 10])])];
+    else list = [...Array.from({ length: ri(1, 3) }, () => ['n', pick([10, 20, 50, 100])]), ...Array.from({ length: ri(1, 2) }, () => ['c', pick([2, 5, 10])])];
+    list.sort((p, q) => (q[0] === 'n') - (p[0] === 'n') || q[1] - p[1]);
+    const total = list.reduce((s, [, v]) => s + v, 0);
+    return numQ('money', 'How much money is this?', 'How much money is this altogether?', total,
+      `Add them, biggest first: ${list.map(([, v]) => '₹' + v).join(' + ')} = ₹${total}.`, { prefix: '₹', visual: moneyHTML(list) });
+  };
+
+  G.shapes = t => {
+    const L = lv(t);
+    if (L === 4) {
+      const v = pick(['name3d', 'name3d', 'faces', 'roll']);
+      if (v === 'faces') return numQ('shapes', 'How many flat faces does a <b>cube</b> have?', 'How many flat faces does a cube have?', 6,
+        'A cube has 6 flat square faces: top, bottom, front, back, left and right. Think of a dice.', { visual: shapeSVG('cube') });
+      if (v === 'roll') {
+        const right = pick(['sphere', 'cylinder']);
+        return mcQ('shapes', 'Which shape can <b>roll</b>?', 'Which shape can roll?', shuffle([right, 'cube', 'cuboid', 'pyramid']).map(s => ({ html: s, text: s, value: s, wide: true })), right,
+          `A ${right} has a curved surface, so it can roll. Cubes, cuboids and pyramids have only flat faces.`);
+      }
+      const name = pick(['cube', 'cuboid', 'cylinder', 'cone', 'sphere']);
+      const opts = shuffle([name, ...shuffle(['cube', 'cuboid', 'cylinder', 'cone', 'sphere'].filter(x => x !== name)).slice(0, 3)]);
+      return mcQ('shapes', 'What is this shape called?', 'What is this shape called?', opts.map(s => ({ html: s, text: s, value: s, wide: true })), name,
+        { cube: 'A cube has 6 equal square faces, like a dice.', cuboid: 'A cuboid is like a box. Its faces are rectangles.', cylinder: 'A cylinder has two flat circles and a curved side, like a tin.', cone: 'A cone has one circle at the bottom and a point at the top, like an ice-cream cone.', sphere: 'A sphere is perfectly round like a ball.' }[name], { visual: shapeSVG(name) });
+    }
+    const names2d = L === 1 ? ['circle', 'triangle', 'square', 'rectangle', 'oval'] : ['circle', 'triangle', 'square', 'rectangle', 'pentagon', 'hexagon', 'oval'];
+    const v = L === 1 ? 'name' : pick(L === 2 ? ['name', 'sides'] : ['sides', 'corners', 'name']);
+    if (v !== 'name') {
+      const name = pick(Object.keys(SHAPE_SIDES)), n = SHAPE_SIDES[name];
+      return numQ('shapes', `How many <b>${v}</b> does this shape have?`, `How many ${v} does this shape have?`, n,
+        `This is a ${name}. Count the ${v} one by one: it has ${n}. A ${name} has ${n} sides and ${n} corners.`, { visual: shapeSVG(name) });
+    }
+    const name = pick(names2d);
+    const opts = shuffle([name, ...shuffle(names2d.filter(x => x !== name)).slice(0, 3)]);
+    const why = { circle: 'A circle is perfectly round with no corners.', oval: 'An oval is a stretched circle, like an egg.', triangle: 'A triangle has 3 sides and 3 corners.', square: 'A square has 4 equal sides.', rectangle: 'A rectangle has 4 sides; the opposite sides are equal and two are longer.', pentagon: 'A pentagon has 5 sides.', hexagon: 'A hexagon has 6 sides, like a honeycomb cell.' }[name];
+    return mcQ('shapes', 'What is this shape called?', 'What is this shape called?', opts.map(s => ({ html: s, text: s, value: s, wide: true })), name, why, { visual: shapeSVG(name) });
+  };
+
+  G.fraction = t => {
+    const L = lv(t);
+    if (L === 4 && R() < 0.35) {
+      const half = R() < 0.5, n = half ? 2 * ri(3, 20) : 4 * ri(2, 8);
+      return numQ('fraction', `What is <b>${half ? 'half' : 'a quarter'}</b> of <b>${n}</b>?`, `What is ${half ? 'half' : 'a quarter'} of ${n}?`, half ? n / 2 : n / 4,
+        half ? `Half means 2 equal parts. ${n} ÷ 2 = ${n / 2}.` : `A quarter means 4 equal parts. ${n} ÷ 4 = ${n / 4}.`);
+    }
+    const n = L === 1 ? pick([2, 4]) : L === 2 ? pick([2, 4, 4]) : pick([2, 3, 4, 3]);
+    const k = L === 1 ? 1 : ri(1, n - 1);
+    const kind = n === 4 ? pick(['pie', 'bar', 'grid']) : pick(['pie', 'bar']);
+    const all = uniq([`${k}/${n}`, `1/${n === 2 ? 4 : 2}`, `${n - k}/${n}`, `${k}/${n + 1}`, `1/3`, `3/4`, `2/3`, `1/4`, `1/2`]).filter(x => { const [a, b] = x.split('/').map(Number); return a < b && b <= 4; });
+    const right = `${k}/${n}`;
+    const opts = [right, ...shuffle(all.filter(x => x !== right)).slice(0, 3)];
+    const words = { '1/2': 'one half', '1/3': 'one third', '2/3': 'two thirds', '1/4': 'one quarter', '2/4': 'two quarters', '3/4': 'three quarters' };
+    return mcQ('fraction', 'What fraction of the shape is <b>coloured</b>?', 'What fraction of the shape is coloured?',
+      shuffle(opts).map(o => { const [a, b] = o.split('/'); return { html: fracHTML(a, b), text: o, value: o }; }), right,
+      `The shape has ${n} equal parts and ${k} ${k > 1 ? 'are' : 'is'} coloured, so ${right} (${words[right]}) is coloured.${right === '2/4' ? ' That is the same as one half!' : ''}`,
+      { visual: fracSVG(n, k, kind) });
+  };
+
+  G.word = t => {
+    const L = lv(t), A = hero(), B = other(A), [item, e] = pick(ITEMS);
+    const v = pick(L === 1 ? ['add', 'sub'] : L === 2 ? ['add', 'sub', 'more'] : L === 3 ? ['add', 'sub', 'mul', 'div'] : ['add', 'sub', 'mul', 'two']);
+    const range = [[3, 15], [12, 60], [25, 99], [120, 480]][L - 1];
+    if (v === 'add') {
+      const a = ri(...range), b = ri(range[0], range[1] - (L === 4 ? 0 : 0));
+      return numQ('word', `${A} has <b>${a}</b> ${item}. ${B} gives ${A === 'Aveer' ? 'him' : 'them'} <b>${b}</b> more. How many ${item} does ${A} have now?`,
+        `${A} has ${a} ${item}. ${B} gives ${b} more. How many ${item} does ${A} have now?`, a + b, `“More” means add. ${a} + ${b} = ${a + b}.`,
+        { visual: L === 1 ? `<div class="items">${e.repeat(a)} <b style="font-size:22px;margin:0 6px">+</b> ${e.repeat(b)}</div>` : '' });
+    }
+    if (v === 'sub') {
+      const a = ri(range[0] + 5, range[1] + 10), b = ri(2, a - 2);
+      return numQ('word', `${A} had <b>${a}</b> ${item} and gave <b>${b}</b> to ${B}. How many ${item} are left with ${A}?`,
+        `${A} had ${a} ${item} and gave ${b} to ${B}. How many are left?`, a - b, `“Gave away” means take away. ${a} − ${b} = ${a - b}.`);
+    }
+    if (v === 'more') {
+      const a = ri(30, 90), b = ri(10, a - 5);
+      return numQ('word', `${A} has <b>${a}</b> ${item}. ${B} has <b>${b}</b> ${item}. How many <b>more</b> ${item} does ${A} have than ${B}?`,
+        `${A} has ${a} ${item}. ${B} has ${b}. How many more does ${A} have?`, a - b, `To find “how many more”, subtract the smaller number from the bigger one: ${a} − ${b} = ${a - b}.`);
+    }
+    if (v === 'mul') {
+      const g = ri(2, L === 3 ? 5 : 9), m = ri(2, L === 3 ? 6 : 10);
+      return numQ('word', `There are <b>${g}</b> boxes. Each box has <b>${m}</b> ${item}. How many ${item} are there in all?`,
+        `There are ${g} boxes with ${m} ${item} in each. How many in all?`, g * m, `${g} boxes of ${m} is ${g} × ${m} = ${g * m}.`);
+    }
+    if (v === 'div') {
+      const d = ri(2, 5), q = ri(2, 6);
+      return numQ('word', `${A} has <b>${d * q}</b> ${item} and puts them equally into <b>${d}</b> bags. How many ${item} go in each bag?`,
+        `${A} has ${d * q} ${item} and puts them equally into ${d} bags. How many in each bag?`, q, `${d * q} ÷ ${d} = ${q}, because ${d} × ${q} = ${d * q}.`);
+    }
+    const n = ri(2, 4), p = ri(8, 20), have = pick([100, 100, 200]);
+    return numQ('word', `${A} has <b>₹${have}</b>. ${A === 'Aveer' ? 'He' : 'They'} buys <b>${n}</b> notebooks that cost <b>₹${p}</b> each. How much money is left?`,
+      `${A} has ${have} rupees and buys ${n} notebooks at ${p} rupees each. How much money is left?`, have - n * p,
+      `First find the cost: ${n} × ₹${p} = ₹${n * p}. Then subtract: ₹${have} − ₹${n * p} = ₹${have - n * p}.`, { prefix: '₹' });
+  };
+
+  function makeTest(t, seed) {
+    seedRng(seed);
+    const plan = PLAN[lv(t) - 1], seen = new Set(), qs = [];
+    for (const topic of plan) {
+      let q, tries = 0;
+      do { q = G[topic](t); tries++; } while (seen.has(q.say) && tries < 8);
+      seen.add(q.say); qs.push(q);
+    }
+    R = Math.random;
+    return qs;
+  }
+
+  // ================= Storage =================
+  // Marks live in this artifact's database when the viewer is signed in to Claude (kept for good,
+  // same on every device), and are always mirrored to this browser as a backup.
+  const KEY = 'aveer.maths.v1', CUR_KEY = 'aveer.maths.current.v1';
+  let mem = { attempts: [], unlockAll: false, sound: true, resetAt: 0, settingsAt: 0 }, localOK = true;
+  try { const raw = localStorage.getItem(KEY); if (raw) mem = Object.assign(mem, JSON.parse(raw)); } catch (_) { localOK = false; }
+  let pending = null; // a test that was left half-way
+  try { const raw = localStorage.getItem(CUR_KEY); if (raw) pending = JSON.parse(raw); } catch (_) {}
+  const validCur = c => c && Array.isArray(c.qs) && c.qs.length === TOTAL && Array.isArray(c.answers);
+  if (!validCur(pending)) pending = null;
+  let topLevel = true; try { topLevel = window.self === window.top; } catch (_) { topLevel = false; }
+  const store = { ref: null, curRef: null, mode: 'checking' };
+  const fallbackMode = () => (topLevel && localOK ? 'device' : 'temp');
+  const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (_) { localOK = false; } };
+  const forRemote = m => {
+    const a = m.attempts.slice(-200).map((x, i, arr) => i < arr.length - 40 ? Object.assign({}, x, { wrong: [] }) : x);
+    return { attempts: a, unlockAll: !!m.unlockAll, resetAt: m.resetAt || 0, settingsAt: m.settingsAt || 0, updated: Date.now() };
+  };
+  function merge(a, b) {
+    const resetAt = Math.max(a.resetAt || 0, b.resetAt || 0), byId = new Map();
+    [...(a.attempts || []), ...(b.attempts || [])].forEach(x => {
+      if (!x || !(x.id > resetAt)) return;
+      const prev = byId.get(x.id);
+      if (!prev || (x.wrong || []).length > (prev.wrong || []).length) byId.set(x.id, x);
+    });
+    const newer = (a.settingsAt || 0) >= (b.settingsAt || 0) ? a : b;
+    return { attempts: [...byId.values()].sort((p, q) => p.id - q.id), unlockAll: !!newer.unlockAll, settingsAt: newer.settingsAt || 0, resetAt };
+  }
+  const sameData = (x, y) => x.attempts.length === y.attempts.length && (x.attempts.at(-1) || {}).id === (y.attempts.at(-1) || {}).id && !!x.unlockAll === !!y.unlockAll && (x.resetAt || 0) === (y.resetAt || 0);
+  let writing = false, dirty = false;
+  async function pushRemote() {
+    if (!store.ref) return;
+    if (writing) { dirty = true; return; }
+    writing = true;
+    try { await store.ref.set(forRemote(mem)); setMode('account'); }
+    catch (e) {
+      let ok = false;
+      if (e && e.code === 'unavailable') { await new Promise(r => setTimeout(r, 700 + Math.random() * 900)); try { await store.ref.set(forRemote(mem)); ok = true; setMode('account'); } catch (_) {} }
+      if (!ok) { store.ref = null; store.curRef = null; setMode(fallbackMode()); }
+    }
+    writing = false;
+    if (dirty) { dirty = false; pushRemote(); }
+  }
+  const save = () => { saveLocal(); pushRemote(); };
+  let curTimer = null;
+  function saveCur() {
+    if (cur) { cur.elapsed = Date.now() - cur.start; cur.savedAt = Date.now(); }
+    try { cur ? localStorage.setItem(CUR_KEY, JSON.stringify(cur)) : localStorage.removeItem(CUR_KEY); } catch (_) {}
+    if (!store.curRef) return;
+    clearTimeout(curTimer);
+    const snap = cur ? JSON.stringify(cur) : null, ref = store.curRef;
+    curTimer = setTimeout(() => { (snap && snap.length < 200000 ? ref.set({ cur: snap, at: Date.now() }) : ref.delete()).catch(() => {}); }, cur ? 1200 : 0);
+  }
+  function clearPending() { pending = null; try { localStorage.removeItem(CUR_KEY); } catch (_) {} if (store.curRef) store.curRef.delete().catch(() => {}); }
+  const STATUS = {
+    checking: ['', 'Checking where marks are saved…'],
+    account: ['ok', '✓ Marks are saved to your Claude account'],
+    device: ['ok', '✓ Marks are saved on this device'],
+    temp: ['warn', '⚠ Marks are not being kept after the app closes']
+  };
+  function setMode(m) {
+    store.mode = m;
+    document.querySelectorAll('.save-status').forEach(el => { el.className = 'save-status ' + STATUS[m][0]; el.textContent = STATUS[m][1]; });
+    const help = $('saveHelp'); if (help) help.innerHTML = saveHelpText();
+  }
+  const statusHTML = () => `<span class="save-status ${STATUS[store.mode][0]}">${STATUS[store.mode][1]}</span>`;
+  function saveHelpText() {
+    if (store.mode === 'account') return 'Marks are saved to your Claude account, so they stay after closing the app and show on any device where you are signed in to Claude.';
+    if (store.mode === 'device') return 'Marks are saved in this browser on this device. Always use the same device and browser, and not private browsing.';
+    if (store.mode === 'temp') return '<b>This browser is not keeping Aveer’s marks.</b> To keep them: on this iPad, open claude.ai in Safari and sign in with your account once, then open this link again. Marks will then be saved to your account.';
+    return 'Checking…';
+  }
+  async function connect() {
+    let db = null;
+    try { if (window.claude && typeof window.claude.use === 'function') db = await window.claude.use('db'); } catch (_) { db = null; }
+    if (!db) { setMode(fallbackMode()); return; }
+    try {
+      store.ref = db.doc('progress/aveer'); store.curRef = db.doc('progress/current');
+      const snap = await store.ref.get();
+      const remote = snap.exists ? snap.data() : null;
+      const merged = remote ? merge(mem, remote) : merge(mem, { attempts: [] });
+      Object.assign(mem, merged); saveLocal();
+      if (!remote || !sameData(remote, merged)) await pushRemote(); else setMode('account');
+      if (!store.ref) return;
+      const cs = await store.curRef.get();
+      if (cs.exists) { try { const rc = JSON.parse(cs.data().cur); if (validCur(rc) && !cur && (!pending || (rc.savedAt || 0) > (pending.savedAt || 0))) pending = rc; } catch (_) {} }
+      refreshView();
+      store.ref.onSnapshot(s => {
+        if (!s.exists || s.metadata.hasPendingWrites) return;
+        const m = merge(mem, s.data());
+        if (!sameData(m, mem)) { Object.assign(mem, m); saveLocal(); refreshView(); }
+      }, () => {});
+    } catch (_) { store.ref = null; store.curRef = null; setMode(fallbackMode()); }
+  }
+  function refreshView() { if (view === 'home') renderHome(); else if (view === 'progress') renderProgress(); }
+  const attemptsOf = t => mem.attempts.filter(a => a.test === t);
+  const bestOf = t => attemptsOf(t).reduce((b, a) => Math.max(b, a.score), -1);
+  const unlocked = t => mem.unlockAll || t === 1 || bestOf(t - 1) >= PASS;
+  const starsFor = s => s >= 14 ? 3 : s >= 11 ? 2 : s >= 8 ? 1 : 0;
+  const starHTML = n => `<span class="stars">${'★'.repeat(n)}<span class="off">${'★'.repeat(3 - n)}</span></span>`;
+  const nextTest = () => { for (let t = 1; t <= 12; t++) if (unlocked(t) && bestOf(t) < 12) return t; let h = 1; for (let t = 1; t <= 12; t++) if (unlocked(t)) h = t; return h; };
+  const fmtSecs = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  const fmtDate = iso => { const d = new Date(iso); return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); };
+
+  // ================= Sound + speech =================
+  let ac = null;
+  const unlockAudio = () => { if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) {} } if (ac && ac.state === 'suspended') ac.resume().catch(() => {}); };
+  function tone(f, d, type = 'triangle', v = 0.1, delay = 0) {
+    if (!ac || !mem.sound) return;
+    const t0 = ac.currentTime + delay, o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t0); g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.001, t0 + d);
+    o.connect(g).connect(ac.destination); o.start(t0); o.stop(t0 + d + 0.02);
+  }
+  const sfx = { tap: () => tone(700, .07), pick: () => tone(880, .09), next: () => { tone(600, .08); tone(900, .1, 'triangle', .08, .07); }, done: () => [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .18, 'triangle', .1, i * .11)) };
+  const canSpeak = 'speechSynthesis' in window;
+  function speak(text) {
+    if (!canSpeak) return;
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text.replace(/×/g, ' times ').replace(/÷/g, ' divided by ').replace(/−/g, ' minus ').replace(/₹\s?(\d+)/g, '$1 rupees'));
+      u.rate = 0.9; u.lang = 'en-IN';
+      const v = speechSynthesis.getVoices().find(x => /en-IN/i.test(x.lang)) || speechSynthesis.getVoices().find(x => /^en/i.test(x.lang));
+      if (v) u.voice = v;
+      speechSynthesis.speak(u);
+    } catch (_) {}
+  }
+
+  // ================= Views =================
+  let view = 'home', cur = null, lastResult = null, timerId = null;
+  function show(v) {
+    view = v;
+    ['Home', 'Test', 'Result', 'Progress'].forEach(n => $('view' + n).hidden = n.toLowerCase() !== v);
+    $('navHome').setAttribute('aria-current', v === 'home');
+    $('navProgress').setAttribute('aria-current', v === 'progress');
+    $('nav').style.visibility = v === 'test' ? 'hidden' : '';
+    window.scrollTo(0, 0);
+  }
+
+  // ---------- Home ----------
+  function renderHome() {
+    const n = mem.attempts.length, nt = nextTest(), last = mem.attempts[n - 1];
+    const hello = n === 0
+      ? `Ready for your first maths test? It has ${TOTAL} questions. Take your time and do your best!`
+      : `You have done ${plural(n, 'test')}. Last time you got <b>${last.score}/${TOTAL}</b> on Test ${last.test}.`;
+    const answered = pending ? pending.answers.filter(Boolean).length : 0;
+    const action = pending
+      ? `<div class="hello-actions"><button class="big-btn" id="resumeBtn">Continue Test ${pending.test} →</button><button class="link-btn" id="dropBtn">Start fresh instead</button></div>`
+      : `<button class="big-btn" data-start="${nt}" id="startNext">Start Test ${nt} →</button>`;
+    let html = `<div class="card hello"><div><h2>Hi Aveer! 👋</h2><p>${pending ? `Test ${pending.test} is waiting for you. ${answered} of ${TOTAL} questions are done.` : hello}</p>${statusHTML()}</div>${action}</div>`;
+    LEVELS.forEach((L, li) => {
+      html += `<div class="level"><div class="level-head"><h3>${L.name}</h3><span>${L.blurb}</span></div><div class="tests">`;
+      for (let t = li * 3 + 1; t <= li * 3 + 3; t++) {
+        const ok = unlocked(t), best = bestOf(t), tries = attemptsOf(t).length;
+        const status = !ok ? `<span class="pill lock">🔒 Locked</span>` : t === nt ? `<span class="pill go">Up next</span>` : best >= PASS ? `<span class="pill ok">✓ Passed</span>` : '';
+        html += `<button class="tcard ${ok ? '' : 'locked'} ${ok && t === nt ? 'next' : ''}" id="test-${t}" data-start="${t}" ${ok ? '' : 'aria-disabled="true"'}>
+          <div class="tn"><b>Test ${t}</b>${status}</div>
+          <div class="meta">${ok ? `${TOTAL} questions · ${tries ? plural(tries, 'try') .replace('trys', 'tries') : 'not tried yet'}` : `Score ${PASS}+ on Test ${t - 1} to open`}</div>
+          <div class="best">${best >= 0 ? `Best ${best}/${TOTAL} ${starHTML(starsFor(best))}` : `<span class="meta">No marks yet</span>`}</div>
+        </button>`;
+      }
+      html += `</div></div>`;
+    });
+    $('viewHome').innerHTML = html;
+    if ($('resumeBtn')) $('resumeBtn').onclick = () => { unlockAudio(); sfx.tap(); resumeTest(); };
+    if ($('dropBtn')) $('dropBtn').onclick = () => { clearPending(); renderHome(); };
+    $('viewHome').querySelectorAll('[data-start]').forEach(b => b.onclick = () => {
+      unlockAudio(); const t = Number(b.dataset.start);
+      if (!unlocked(t)) { modal(`<h3>Test ${t} is locked</h3><p>Get ${PASS} or more out of ${TOTAL} on Test ${t - 1} to open it.</p><div class="row"><button class="big-btn" data-m="close">OK</button></div>`); return; }
+      sfx.tap(); startTest(t);
+    });
+  }
+
+  // ---------- Test ----------
+  function startTest(t) {
+    pending = null;
+    cur = { test: t, qs: makeTest(t, (Date.now() ^ (t * 7919)) >>> 0), i: 0, answers: Array(TOTAL).fill(''), start: Date.now() };
+    show('test'); renderQ(); startTimer(); saveCur();
+  }
+  function resumeTest() {
+    if (!pending) return;
+    cur = pending; pending = null;
+    cur.start = Date.now() - (cur.elapsed || 0);
+    show('test'); renderQ(); startTimer(); saveCur();
+  }
+  function startTimer() { clearInterval(timerId); timerId = setInterval(() => { const el = $('timer'); if (el && cur) el.textContent = '⏱ ' + fmtSecs(Math.floor((Date.now() - cur.start) / 1000)); }, 1000); }
+
+  function renderQ() {
+    const q = cur.qs[cur.i], i = cur.i, val = cur.answers[i], T = TOPICS[q.topic];
+    const optsHTML = q.kind === 'mc'
+      ? `<div class="opts">${q.options.map((o, k) => `<button class="opt ${o.wide || q.options.some(x => x.wide) ? 'wide' : ''}" id="opt-${k}" data-v="${o.value}" aria-pressed="${val === o.value}">${o.html}</button>`).join('')}</div>`
+      : `<div class="display" id="disp">${q.prefix ? `<span class="unit">${q.prefix}</span>` : ''}<span id="dispVal">${val || '<span class="ph">Tap the numbers</span>'}</span></div>
+         <div class="pad">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button class="key" id="key-${n}" data-k="${n}">${n}</button>`).join('')}<button class="key fn" id="key-clear" data-k="C">Clear</button><button class="key" id="key-0" data-k="0">0</button><button class="key fn" id="key-back" data-k="B" aria-label="Delete">⌫</button></div>`;
+    const last = i === TOTAL - 1;
+    $('viewTest').innerHTML = `
+      <div class="tbar"><span class="ttl">Test ${cur.test}</span><div class="prog" aria-label="Question ${i + 1} of ${TOTAL}"><i style="width:${(i / TOTAL) * 100}%"></i></div><span class="timer" id="timer">⏱ ${fmtSecs(Math.floor((Date.now() - cur.start) / 1000))}</span><button class="xbtn" id="quitBtn" aria-label="Stop test">✕</button></div>
+      <div class="qwrap">
+        <div class="card qcard">
+          <div class="qhead"><span class="chip">${T.icon} ${T.name}</span><span class="qno">Question ${i + 1} of ${TOTAL}</span>${canSpeak ? `<button class="speak" id="speakBtn" aria-label="Read the question aloud">🔈 Read</button>` : ''}</div>
+          <div class="qtext">${q.html}</div>
+          ${q.visual ? `<div class="visual">${q.visual}</div>` : ''}
+        </div>
+        <div class="card acard">${optsHTML}
+          <div class="qnav"><button class="big-btn alt back" id="prevBtn" ${i === 0 ? 'disabled style="visibility:hidden"' : ''}>←</button><button class="big-btn" id="nextBtn">${last ? 'Finish test ✓' : (val ? 'Next →' : 'Skip →')}</button></div>
+        </div>
+      </div>`;
+    syncSlot();
+    $('quitBtn').onclick = () => modal(`<h3>Stop this test?</h3><p>Your answers so far will not be marked.</p><div class="row"><button class="big-btn alt" data-m="close">Keep going</button><button class="big-btn" data-m="quit">Stop test</button></div>`);
+    if ($('speakBtn')) $('speakBtn').onclick = () => speak(q.say);
+    $('prevBtn').onclick = () => { if (cur.i > 0) { cur.i--; sfx.tap(); renderQ(); saveCur(); } };
+    $('nextBtn').onclick = next;
+    $('viewTest').querySelectorAll('.opt').forEach(b => b.onclick = () => { unlockAudio(); cur.answers[cur.i] = b.dataset.v; sfx.pick(); saveCur(); $('viewTest').querySelectorAll('.opt').forEach(x => x.setAttribute('aria-pressed', x === b)); updateNextLabel(); });
+    $('viewTest').querySelectorAll('.key').forEach(b => b.onclick = () => { unlockAudio(); press(b.dataset.k); });
+  }
+  function press(k) {
+    let v = cur.answers[cur.i];
+    if (k === 'C') v = ''; else if (k === 'B') v = v.slice(0, -1); else if (v.length < 4) v = (v === '0' ? '' : v) + k;
+    cur.answers[cur.i] = v; tone(500 + Number(k || 0) * 30 || 420, .05); saveCur();
+    $('dispVal').innerHTML = v || '<span class="ph">Tap the numbers</span>';
+    syncSlot(); updateNextLabel();
+  }
+  function syncSlot() { const q = cur.qs[cur.i]; if (q.kind !== 'num') return; const v = cur.answers[cur.i]; $('viewTest').querySelectorAll('.qtext .slot, .visual .slot').forEach(s => s.textContent = v || '?'); }
+  function updateNextLabel() { if (cur.i < TOTAL - 1) $('nextBtn').textContent = cur.answers[cur.i] ? 'Next →' : 'Skip →'; }
+  function next() {
+    if (cur.i < TOTAL - 1) { cur.i++; sfx.next(); renderQ(); saveCur(); return; }
+    const skipped = cur.answers.map((a, i) => a ? -1 : i).filter(i => i >= 0);
+    if (skipped.length) {
+      modal(`<h3>${plural(skipped.length, 'question')} not answered</h3><p>Question ${skipped.map(i => i + 1).join(', ')} ${skipped.length > 1 ? 'are' : 'is'} empty. Empty answers get no marks.</p><div class="row"><button class="big-btn alt" data-m="goto" data-q="${skipped[0]}">Go back</button><button class="big-btn" data-m="finish">Finish anyway</button></div>`);
+      return;
+    }
+    finish();
+  }
+  document.addEventListener('keydown', e => {
+    if (view !== 'test' || !$('modal').hidden) return;
+    const q = cur.qs[cur.i];
+    if (q.kind === 'num' && /^[0-9]$/.test(e.key)) press(e.key);
+    else if (q.kind === 'num' && e.key === 'Backspace') press('B');
+    else if (e.key === 'Enter' && !(e.target instanceof HTMLButtonElement)) next();
+  });
+
+  // ---------- Finish + results ----------
+  const isRight = (q, a) => a !== '' && (q.kind === 'num' ? Number(a) === Number(q.answer) : a === q.answer);
+  const ansText = (q, a) => { if (a === '') return 'No answer'; if (q.kind === 'num') return (q.prefix || '') + a; const o = q.options.find(x => x.value === a); return o ? o.text : a; };
+  const ansHTML = (q, a) => { if (a === '') return 'No answer'; if (q.kind === 'num') return (q.prefix || '') + a; const o = q.options.find(x => x.value === a); return o ? o.html : a; };
+
+  function topicStats(attempts) {
+    const s = {};
+    attempts.forEach(a => Object.entries(a.topics).forEach(([k, [c, n]]) => { s[k] = s[k] || [0, 0]; s[k][0] += c; s[k][1] += n; }));
+    return s;
+  }
+
+  function finish() {
+    clearInterval(timerId);
+    const secs = Math.round((Date.now() - cur.start) / 1000);
+    const topics = {}, wrong = [];
+    let score = 0;
+    cur.qs.forEach((q, i) => {
+      const ok = isRight(q, cur.answers[i]); if (ok) score++;
+      topics[q.topic] = topics[q.topic] || [0, 0]; topics[q.topic][1]++; if (ok) topics[q.topic][0]++;
+      if (!ok) wrong.push({ topic: q.topic, say: q.say, given: ansText(q, cur.answers[i]), correct: ansText(q, q.answer) });
+    });
+    const prior = mem.attempts.slice();
+    const attempt = { id: Date.now(), test: cur.test, date: new Date().toISOString(), score, total: TOTAL, secs, topics, wrong };
+    mem.attempts.push(attempt); if (mem.attempts.length > 400) mem.attempts.shift(); save();
+    lastResult = { attempt, qs: cur.qs, answers: cur.answers, prior };
+    cur = null; saveCur(); renderResult(); show('result');
+    sfx.done(); if (score >= 11) confetti();
+  }
+
+  function progressNotes(attempt, prior) {
+    const notes = [], same = prior.filter(a => a.test === attempt.test), prev = prior[prior.length - 1];
+    if (same.length) {
+      const p = same[same.length - 1], d = attempt.score - p.score;
+      notes.push([d > 0 ? 'up' : d < 0 ? 'down' : 'flat', d > 0 ? `Up <b>${plural(d, 'mark')}</b> on Test ${attempt.test} since last try (${p.score} → ${attempt.score}).` : d < 0 ? `${plural(-d, 'mark')} lower than last try on Test ${attempt.test} (${p.score} → ${attempt.score}). A new set of questions can feel harder. Try again!` : `Same marks as last try on Test ${attempt.test} (${attempt.score}).`]);
+    } else if (prev) {
+      const d = attempt.score - prev.score;
+      notes.push([d > 0 ? 'up' : d < 0 ? 'down' : 'flat', `First go at Test ${attempt.test}. Last test (Test ${prev.test}) was ${prev.score}/${TOTAL}; this one is ${attempt.score}/${TOTAL}${attempt.test > prev.test && d >= 0 ? ', even though it is harder' : ''}.`]);
+    } else notes.push(['flat', `This is the very first test. These marks are the starting point to compare with next time.`]);
+    const ps = topicStats(prior);
+    const better = [], worse = [];
+    Object.entries(attempt.topics).forEach(([k, [c, n]]) => {
+      if (!ps[k] || ps[k][1] < 2) return;
+      const before = ps[k][0] / ps[k][1], now = c / n;
+      if (now - before >= 0.25) better.push(`${TOPICS[k].name} (${Math.round(before * 100)}% → ${Math.round(now * 100)}%)`);
+      if (before - now >= 0.34) worse.push(TOPICS[k].name);
+    });
+    if (better.length) notes.push(['up', `Getting better at ${better.slice(0, 3).join(', ')}.`]);
+    const missed = Object.entries(attempt.topics).filter(([, [c, n]]) => c < n).map(([k]) => TOPICS[k].name);
+    if (missed.length) notes.push(['down', `Practise next: ${missed.slice(0, 3).join(', ')}.`]);
+    else notes.push(['up', `Every topic correct. Amazing!`]);
+    if (attempt.score >= PASS && attempt.test < 12 && !prior.some(a => a.test === attempt.test && a.score >= PASS) && !mem.unlockAll) notes.push(['up', `Test ${attempt.test + 1} is now open!`]);
+    return notes;
+  }
+
+  function renderResult() {
+    const { attempt: a, qs, answers, prior } = lastResult, s = a.score, pct = Math.round(s / TOTAL * 100);
+    const msg = s >= 14 ? 'Superstar, Aveer! 🌟' : s >= 11 ? 'Great work, Aveer! 🎉' : s >= 8 ? 'Good try, Aveer! 👍' : 'Let’s practise and try again 💪';
+    const notes = progressNotes(a, prior);
+    const tRows = Object.entries(a.topics).map(([k, [c, n]]) => {
+      const p = c / n, col = p === 1 ? 'var(--mint)' : p >= .5 ? 'var(--sun)' : 'var(--coral)';
+      return `<div class="trow"><span class="nm">${TOPICS[k].icon} ${TOPICS[k].name}</span><div class="bar"><i style="width:${Math.max(p * 100, 3)}%;background:${col}"></i></div><span class="sc">${c} / ${n}</span></div>`;
+    }).join('');
+    const rev = qs.map((q, i) => {
+      const ok = isRight(q, answers[i]);
+      return `<details class="ritem ${ok ? '' : 'wrong'}" ${ok ? '' : 'open'}><summary><span class="mark ${ok ? 'y' : 'n'}">${ok ? '✓' : '✗'}</span><span class="rq">${i + 1}. ${TOPICS[q.topic].name}: ${q.say}</span></summary>
+        <div class="rbody"><div class="qtext">${q.html}</div>${q.visual ? `<div class="visual">${q.visual}</div>` : ''}
+        <div class="ans-line">Aveer’s answer: <b class="${ok ? 'cr' : 'gv'}">${ansHTML(q, answers[i])}</b>${ok ? '' : ` &nbsp;·&nbsp; Correct answer: <b class="cr">${ansHTML(q, q.answer)}</b>`}</div>
+        ${ok ? '' : `<div class="explain">💡 ${q.explain}</div>`}</div></details>`;
+    }).join('');
+    const nextOpen = a.test < 12 && unlocked(a.test + 1);
+    $('viewResult').innerHTML = `
+      <div class="card res-hero">
+        <span class="chip">Test ${a.test} · ${LEVELS[lv(a.test) - 1].name}</span>
+        <div class="res-msg">${msg}</div>
+        <div class="marks">${s}<small> / ${TOTAL}</small></div>
+        ${starHTML(starsFor(s))}
+        <div class="res-facts"><span>${pct}%</span><span>${plural(TOTAL - s, 'mistake')}</span><span>⏱ ${fmtSecs(a.secs)}</span><span>${s >= PASS ? '✓ Passed' : `Pass mark is ${PASS}`}</span></div>
+        <div class="res-actions">
+          ${nextOpen ? `<button class="big-btn" id="goNext">Test ${a.test + 1} →</button>` : ''}
+          <button class="big-btn ${nextOpen ? 'alt' : ''}" id="again">Try Test ${a.test} again</button>
+          <button class="big-btn alt" id="toProgress">See progress</button>
+        </div>
+      </div>
+      <div class="card notes"><h3>How Aveer is doing</h3><ul>${notes.map(([k, t]) => `<li><span class="dot ${k}">${k === 'up' ? '↑' : k === 'down' ? '!' : '•'}</span><span>${t}</span></li>`).join('')}</ul></div>
+      <div class="card section"><h3>Marks by topic</h3><div class="topics">${tRows}</div></div>
+      <div class="card section"><h3>Check the answers</h3><div class="review">${rev}</div></div>`;
+    if ($('goNext')) $('goNext').onclick = () => { unlockAudio(); startTest(a.test + 1); };
+    $('again').onclick = () => { unlockAudio(); startTest(a.test); };
+    $('toProgress').onclick = () => { renderProgress(); show('progress'); };
+  }
+
+  // ---------- Progress ----------
+  function renderProgress() {
+    const A = mem.attempts, n = A.length;
+    if (!n) {
+      $('viewProgress').innerHTML = `<div class="card section"><div class="empty"><b>No tests yet</b>Finish Test 1 and Aveer’s marks, best topics and progress will appear here.</div><div style="text-align:center"><button class="big-btn" id="goFirst">Start Test 1 →</button></div></div>${parentBox()}`;
+      $('goFirst').onclick = () => { unlockAudio(); startTest(1); };
+      wireParent(); return;
+    }
+    const avg = Math.round(A.reduce((s, a) => s + a.score, 0) / n / TOTAL * 100);
+    const best = A.reduce((b, a) => a.score > b.score ? a : b, A[0]);
+    const passed = new Set(A.filter(a => a.score >= PASS).map(a => a.test)).size;
+    const level = lv(Math.min(12, nextTest()));
+    const ts = topicStats(A), recent = topicStats(A.slice(-3)), early = topicStats(A.slice(0, Math.max(1, Math.floor(n / 2))));
+    const rows = Object.keys(TOPICS).filter(k => ts[k]).map(k => {
+      const p = ts[k][0] / ts[k][1], r = recent[k] ? recent[k][0] / recent[k][1] : null;
+      const tag = p >= .85 ? '<span class="tag m">Mastered</span>' : p >= .6 ? '<span class="tag g">Getting there</span>' : '<span class="tag n">Needs practice</span>';
+      const col = p >= .85 ? 'var(--mint)' : p >= .6 ? 'var(--sun)' : 'var(--coral)';
+      return { k, p, r, html: `<div class="trow"><span class="nm">${TOPICS[k].icon} ${TOPICS[k].name}</span><div class="bar"><i style="width:${Math.max(p * 100, 3)}%;background:${col}"></i></div><span class="sc">${Math.round(p * 100)}%${tag}</span></div>` };
+    });
+    // overall notes
+    const notes = [];
+    if (n >= 4) {
+      const h = Math.floor(n / 2), first = A.slice(0, h), last = A.slice(-h);
+      const f = first.reduce((s, a) => s + a.score, 0) / h, l = last.reduce((s, a) => s + a.score, 0) / h, d = Math.round((l - f) * 10) / 10;
+      notes.push([d > 0.4 ? 'up' : d < -0.4 ? 'down' : 'flat', `Average marks moved from <b>${f.toFixed(1)}</b> in the first ${plural(h, 'test')} to <b>${l.toFixed(1)}</b> in the latest ${plural(h, 'test')}${d > 0.4 ? '. Steady improvement!' : d < -0.4 ? ', partly because the later tests are harder.' : '.'}`]);
+    } else if (n >= 2) {
+      const d = A[n - 1].score - A[n - 2].score;
+      notes.push([d > 0 ? 'up' : d < 0 ? 'down' : 'flat', `Latest test ${A[n - 1].score}/${TOTAL}, the one before ${A[n - 2].score}/${TOTAL} (${d > 0 ? '+' : ''}${d}).`]);
+    } else notes.push(['flat', `One test done so far (${A[0].score}/${TOTAL}). Progress trends appear after a few more tests.`]);
+    const improved = rows.filter(r => early[r.k] && recent[r.k] && early[r.k][1] >= 2 && (recent[r.k][0] / recent[r.k][1]) - (early[r.k][0] / early[r.k][1]) >= .2).map(r => TOPICS[r.k].name);
+    if (improved.length && n >= 3) notes.push(['up', `Improved most in: ${improved.slice(0, 3).join(', ')}.`]);
+    const strong = rows.filter(r => r.p >= .85).map(r => TOPICS[r.k].name), weak = rows.filter(r => r.p < .6).sort((x, y) => x.p - y.p).map(r => TOPICS[r.k].name);
+    if (strong.length) notes.push(['up', `Strongest topics: ${strong.slice(0, 4).join(', ')}.`]);
+    if (weak.length) notes.push(['down', `Needs more practice: ${weak.slice(0, 3).join(', ')}. Use the answer review after each test to go over these together.`]);
+    const avgQ = Math.max(1, Math.round(A.slice(-5).reduce((s, a) => s + a.secs, 0) / Math.min(5, n) / TOTAL));
+    notes.push(['flat', `Takes about <b>${avgQ} seconds</b> per question in recent tests.`]);
+
+    const hist = A.slice().reverse().map(a => `<tr><td>${fmtDate(a.date)}</td><td>Test ${a.test}</td><td><b>${a.score}/${TOTAL}</b> ${starHTML(starsFor(a.score))}</td><td>${fmtSecs(a.secs)}</td><td>${a.wrong.length ? `<details><summary>${plural(a.wrong.length, 'mistake')}</summary><ul>${a.wrong.map(w => `<li>${w.say} Aveer: ${w.given}. Correct: ${w.correct}.</li>`).join('')}</ul></details>` : '✓ All correct'}</td></tr>`).join('');
+
+    $('viewProgress').innerHTML = `
+      <div class="tiles">
+        <div class="card tile"><div class="k">Tests taken</div><div class="v">${n}</div></div>
+        <div class="card tile"><div class="k">Average</div><div class="v">${avg}%</div></div>
+        <div class="card tile"><div class="k">Best</div><div class="v">${best.score}/${TOTAL}</div></div>
+        <div class="card tile"><div class="k">Tests passed</div><div class="v">${passed}/12</div></div>
+      </div>
+      <div class="card notes"><h3>Progress notes</h3><ul>${notes.map(([k, t]) => `<li><span class="dot ${k}">${k === 'up' ? '↑' : k === 'down' ? '!' : '•'}</span><span>${t}</span></li>`).join('')}</ul></div>
+      <div class="card section"><h3>Marks over time</h3><div class="chart-box" id="chart"></div><p class="meta" style="color:var(--muted);margin:8px 0 0;font-size:14px">Each dot is one test (out of ${TOTAL}). The dashed line is the pass mark (${PASS}). Now working at ${LEVELS[level - 1].name}.</p></div>
+      <div class="card section"><h3>Topics</h3><div class="topics wide">${rows.map(r => r.html).join('')}</div></div>
+      <div class="card section"><h3>All tests</h3><div class="tblwrap"><table class="hist"><thead><tr><th>When</th><th>Test</th><th>Marks</th><th>Time</th><th>Mistakes</th></tr></thead><tbody>${hist}</tbody></table></div></div>
+      ${parentBox()}`;
+    drawChart(); wireParent();
+  }
+
+  function drawChart() {
+    const box = $('chart'); if (!box) return;
+    const A = mem.attempts.slice(-30), W = Math.max(280, box.clientWidth), H = 230, pl = 34, pr = 16, pt = 14, pb = 34;
+    const x = i => A.length === 1 ? pl + (W - pl - pr) / 2 : pl + i * (W - pl - pr) / (A.length - 1);
+    const y = v => pt + (1 - v / TOTAL) * (H - pt - pb);
+    let s = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Marks over time chart">`;
+    [0, 5, 10, 15].forEach(v => s += `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${pl - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`);
+    s += `<line x1="${pl}" x2="${W - pr}" y1="${y(PASS)}" y2="${y(PASS)}" stroke="var(--coral)" stroke-width="1.5" stroke-dasharray="6 5" opacity=".8"/><text x="${pl + 6}" y="${y(PASS) - 6}" text-anchor="start">pass mark</text>`;
+    if (A.length > 1) {
+      const pts = A.map((a, i) => `${x(i)},${y(a.score)}`).join(' ');
+      s += `<polygon points="${pl},${y(0)} ${pts} ${x(A.length - 1)},${y(0)}" fill="var(--grape)" opacity=".12"/>`;
+      s += `<polyline points="${pts}" fill="none" stroke="var(--grape)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+    }
+    const every = Math.ceil(A.length / Math.max(1, Math.floor((W - pl - pr) / 34)));
+    A.forEach((a, i) => {
+      const lastOne = i === A.length - 1;
+      s += `<circle cx="${x(i)}" cy="${y(a.score)}" r="${lastOne ? 7 : 4.5}" fill="${a.score >= PASS ? 'var(--grape)' : 'var(--coral)'}" stroke="var(--card)" stroke-width="2"><title>Test ${a.test}: ${a.score}/${TOTAL}</title></circle>`;
+      if (i % every === 0 || lastOne) s += `<text x="${x(i)}" y="${H - 12}" text-anchor="middle">T${a.test}</text>`;
+    });
+    const L = A[A.length - 1];
+    s += `<text x="${Math.min(x(A.length - 1), W - pr - 10)}" y="${y(L.score) - 12}" text-anchor="middle" style="fill:var(--ink);font-size:13px;font-weight:800">${L.score}</text>`;
+    box.innerHTML = s + '</svg>';
+  }
+
+  function parentBox() {
+    return `<div class="card section"><h3>For parents</h3><div class="parent">
+      <div class="parent-text">${statusHTML()}<p id="saveHelp">${saveHelpText()}</p><p>Each try gives new questions at the same level. Tests open one by one when Aveer scores ${PASS} or more. A test left half-way can be continued from the Tests page.</p></div>
+      <label class="switch"><input type="checkbox" id="unlockAll" ${mem.unlockAll ? 'checked' : ''}> Open all tests</label>
+      <button class="danger" id="resetBtn" data-armed="false">Reset all marks</button></div>
+      <div class="backup"><h3 style="font-size:18px">Backup</h3>
+        <p>Copy a backup code and keep it in Notes or WhatsApp. If the marks are ever lost, or you move to a new iPad, paste it here to bring them back.</p>
+        <div class="backup-row"><button class="big-btn alt small" id="copyBackup">Copy backup code</button><button class="big-btn alt small" id="showRestore">Restore from a code</button></div>
+        <textarea id="backupText" class="code-box" readonly hidden aria-label="Backup code"></textarea>
+        <div id="restoreBox" hidden><textarea id="restoreText" class="code-box" placeholder="Paste the backup code here" aria-label="Paste backup code"></textarea><button class="big-btn small" id="doRestore">Restore marks</button></div>
+        <p id="backupMsg" class="backup-msg" role="status"></p>
+      </div></div>`;
+  }
+  function wireParent() {
+    const u = $('unlockAll'); if (u) u.onchange = () => { mem.unlockAll = u.checked; mem.settingsAt = Date.now(); save(); };
+    const msg = t => { $('backupMsg').textContent = t; };
+    $('copyBackup').onclick = async () => {
+      const code = 'AVEER1:' + btoa(unescape(encodeURIComponent(JSON.stringify({ attempts: mem.attempts, unlockAll: mem.unlockAll, settingsAt: mem.settingsAt || 0, resetAt: mem.resetAt || 0 }))));
+      const box = $('backupText'); box.value = code;
+      try { await navigator.clipboard.writeText(code); box.hidden = true; msg(`Backup code copied (${plural(mem.attempts.length, 'test')}). Paste it into Notes or a message to keep it safe.`); }
+      catch (_) { box.hidden = false; box.focus(); box.select(); msg('Copy the selected code above and keep it in Notes.'); }
+    };
+    $('showRestore').onclick = () => { $('restoreBox').hidden = false; $('restoreText').focus(); };
+    $('doRestore').onclick = () => {
+      const raw = $('restoreText').value.trim();
+      try {
+        if (!raw.startsWith('AVEER1:')) throw 0;
+        const data = JSON.parse(decodeURIComponent(escape(atob(raw.slice(7)))));
+        if (!Array.isArray(data.attempts)) throw 0;
+        const before = mem.attempts.length;
+        Object.assign(mem, merge(mem, data)); save(); renderProgress();
+        $('backupMsg').textContent = `Restored. ${plural(mem.attempts.length - before, 'test')} added back.`;
+      } catch (_) { msg('That code did not work. Copy the whole code, starting with AVEER1:'); }
+    };
+    const r = $('resetBtn');
+    if (r) r.onclick = () => {
+      if (r.dataset.armed !== 'true') { r.dataset.armed = 'true'; r.textContent = 'Tap again to delete all marks'; return; }
+      mem.attempts = []; mem.resetAt = Date.now(); save(); renderProgress();
+    };
+  }
+
+  // ---------- Modal, confetti ----------
+  function modal(html) {
+    $('modalCard').innerHTML = html; $('modal').hidden = false;
+    $('modalCard').querySelectorAll('[data-m]').forEach(b => b.onclick = () => {
+      const m = b.dataset.m; $('modal').hidden = true;
+      if (m === 'quit') { clearInterval(timerId); cur = null; saveCur(); renderHome(); show('home'); }
+      else if (m === 'finish') finish();
+      else if (m === 'goto') { cur.i = Number(b.dataset.q); renderQ(); }
+    });
+  }
+  function confetti() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const c = $('confetti'), x = c.getContext('2d'); c.hidden = false;
+    c.width = innerWidth; c.height = innerHeight;
+    const cols = ['#5B3FD1', '#F5A700', '#12976F', '#DC3F47', '#3BA7F5', '#F06292'];
+    const ps = Array.from({ length: 140 }, () => ({ x: Math.random() * c.width, y: -20 - Math.random() * c.height * .5, vx: (Math.random() - .5) * 3, vy: 2 + Math.random() * 4, r: Math.random() * 6, s: 6 + Math.random() * 7, c: cols[(Math.random() * cols.length) | 0] }));
+    const t0 = performance.now();
+    (function f(now) {
+      x.clearRect(0, 0, c.width, c.height);
+      ps.forEach(p => { p.x += p.vx; p.y += p.vy; p.r += .1; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); x.restore(); });
+      if (now - t0 < 2600) requestAnimationFrame(f); else { x.clearRect(0, 0, c.width, c.height); c.hidden = true; }
+    })(t0);
+  }
+
+  // ---------- Nav ----------
+  $('navHome').onclick = () => { unlockAudio(); renderHome(); show('home'); };
+  $('navProgress').onclick = () => { unlockAudio(); renderProgress(); show('progress'); };
+  const syncSound = () => { $('navSound').querySelector('.ic').textContent = mem.sound ? '🔊' : '🔇'; $('navSound').setAttribute('aria-label', mem.sound ? 'Sound on' : 'Sound off'); };
+  $('navSound').onclick = () => { mem.sound = !mem.sound; save(); syncSound(); unlockAudio(); sfx.tap(); };
+  syncSound();
+  window.addEventListener('resize', () => { if (view === 'progress') drawChart(); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && cur) saveCur(); });
+  window.addEventListener('pagehide', () => { if (cur) saveCur(); });
+
+  // ---------- Start (keeps a test in progress across page updates) ----------
+  const hot = window.claude && window.claude.hot;
+  function boot(data) {
+    data = data || {};
+    if (data.cur && data.cur.qs) { cur = data.cur; show('test'); renderQ(); startTimer(); }
+    else { renderHome(); show('home'); }
+    connect();
+  }
+  if (hot && hot.snapshot) hot.snapshot(() => ({ cur }));
+  if (hot && hot.ready) hot.ready(boot); else boot((hot && hot.data) || {});
+  window.__aveer = { makeTest, G, lv, cur: () => cur };
+})();
+</script>
+
+</body>
+</html>
